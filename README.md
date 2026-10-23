@@ -140,12 +140,12 @@ python app.py
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860) in your browser. If the browser does not open automatically, enter that address yourself.
 
-1. Write a prompt in English (the default model follows English prompts best).
-2. Optionally add a negative prompt for things you want the image to avoid.
-3. Start with 512 × 512. Higher dimensions need more memory.
-4. Leave seed at -1 for a random result, or enter a number to reproduce a result approximately.
-5. Select Generate image. The first generation can take longer while the model loads into memory.
-6. Find the saved PNG in the repository's outputs folder.
+1. Type what you want to see, or click one of the example ideas. This model follows English prompts best.
+2. Optionally list things to avoid, such as "blurry" or "extra fingers."
+3. Choose an art style, such as watercolor, anime, or photorealistic.
+4. Start with 512 × 512; larger images need more memory.
+5. Leave seed at -1 for a different result each time, or reuse a number to make a similar result again.
+6. Select Generate image. The first generation can take longer while the model loads. The app shows the seed, device, and style, and saves a PNG in the outputs folder.
 
 The app listens on your own computer at 127.0.0.1, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. It does not send prompts or generated images to a hosted inference service.
 
