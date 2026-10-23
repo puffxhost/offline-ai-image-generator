@@ -1,0 +1,13 @@
+services:
+  offline-image-studio:
+    build: .
+    ports:
+      - "127.0.0.1:7860:7860"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "7860"
+      MODEL_DIR: "/models/stable-diffusion-v1-5"
+      OUTPUT_DIR: "/outputs"
+    volumes:
+      - ./models/stable-diffusion-v1-5:/models/stable-diffusion-v1-5
+      - ./outputs:/outputs
