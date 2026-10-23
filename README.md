@@ -184,6 +184,66 @@ python app.py
 
 Keep the model directory and the virtual environment on the computer. You can use the same installation offline.
 
+## 8. Other places you can run it
+
+### Windows Subsystem for Linux (WSL2)
+
+WSL2 is useful if you prefer Linux commands while using Windows. First install Ubuntu from an elevated Windows PowerShell or CMD:
+
+~~~powershell
+wsl --install -d Ubuntu
+wsl --status
+~~~
+
+Restart Windows if requested, then open Ubuntu from the Start menu and create your Linux username. In the Ubuntu terminal:
+
+~~~bash
+sudo apt update
+sudo apt install -y git python3 python3-venv python3-pip
+git clone https://github.com/puffxhost/offline-image-studio.git
+cd offline-image-studio
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+~~~
+
+Install PyTorch using the official selector. Choose Linux/Pip/Python and CPU, or choose a CUDA build only if your Windows NVIDIA driver and WSL2 GPU support are configured. Then continue with the requirements install, model download, and app launch steps above.
+
+For better file performance, keep the project inside the WSL Linux filesystem (for example, under your Linux home directory) instead of /mnt/c. After downloading the model, the app can generate offline inside WSL2.
+
+### Docker (CPU mode)
+
+The repository includes a Dockerfile and Compose file for a CPU-only container. This is useful when Docker is installed and you want an isolated environment. CPU generation may be slow. For Apple Silicon/MPS or NVIDIA CUDA performance, install and run the app natively using the OS instructions above.
+
+Install Docker Desktop on Windows/macOS, or Docker Engine and the Compose plugin on Linux. Start Docker, open a terminal in the cloned repository, and build the image while online:
+
+~~~bash
+docker compose build
+~~~
+
+Download the model into the mounted models folder while online:
+
+~~~bash
+docker compose run --rm offline-image-studio python scripts/download_model.py
+~~~
+
+Then disconnect from the internet and start the app:
+
+~~~bash
+docker compose up
+~~~
+
+Open http://127.0.0.1:7860 in your browser. Images are saved in the repository's outputs folder. Press Ctrl+C to stop; use docker compose down to stop and remove the container. The model and output folders are stored on your computer and remain there. On later runs, use docker compose up.
+
+The Docker image uses CPU PyTorch. Building the image and downloading the model require internet once. Docker GPU support is not configured by these files; use a native CUDA installation or WSL2 for NVIDIA GPU acceleration.
+
+### Cloud notebooks and remote machines
+
+Google Colab, Kaggle notebooks, and hosted virtual machines can run Python apps, but they are not a reliable way to meet the offline goal: they need internet to set up, may reset their storage, and run on someone else's computer. Use a cloud notebook only when you are okay with those limits.
+
+A remote Linux computer can run this app if it has Python and enough disk/RAM/GPU, but it is only offline after all packages and the model are already present there. Connecting to that remote machine still uses a network. For fully local offline generation, use Windows, macOS, Linux, WSL2, or Docker on your own computer.
+
+
 ## Optional settings
 
 The app reads these environment variables when it starts:
