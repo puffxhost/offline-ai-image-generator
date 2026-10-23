@@ -49,29 +49,43 @@ def get_pipeline() -> tuple[StableDiffusionPipeline, str]:
                 "scripts/download_model.py. Then you can disconnect and run this app offline."
             )
 
+        device_options = []
         if torch.cuda.is_available():
-            device, dtype = "cuda", torch.float16
+            device_options.append(("cuda", torch.float16))
         elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-            device, dtype = "mps", torch.float16
-        else:
-            device, dtype = "cpu", torch.float32
+            device_options.append(("mps", torch.float16))
+        device_options.append(("cpu", torch.float32))
 
-        try:
-            _pipeline = StableDiffusionPipeline.from_pretrained(
-                str(MODEL_DIR),
-                torch_dtype=dtype,
-                local_files_only=True,
-            )
-            _pipeline.to(device)
-            if device == "cpu":
-                _pipeline.enable_attention_slicing()
-        except Exception as exc:
-            _pipeline = None
-            raise gr.Error(
-                f"Could not load the local model from {MODEL_DIR}. Check that the download "
-                f"finished and the installed PyTorch/Diffusers versions are compatible. Details: {exc}"
-            ) from exc
-        return _pipeline, device
+        load_errors = []
+        for device, dtype in device_options:
+            candidate = None
+            try:
+                candidate = StableDiffusionPipeline.from_pretrained(
+                    str(MODEL_DIR),
+                    torch_dtype=dtype,
+                    local_files_only=True,
+                )
+                candidate.to(device)
+                if device in {"cpu", "mps"}:
+                    candidate.enable_attention_slicing()
+                _pipeline = candidate
+                return _pipeline, device
+            except Exception as exc:
+                _pipeline = None
+                load_errors.append(f"{device}: {exc}")
+                candidate = None
+                gc.collect()
+                if device == "cuda":
+                    try:
+                        torch.cuda.empty_cache()
+                    except Exception:
+                        pass
+
+        details = "\\n".join(load_errors)
+        raise gr.Error(
+            f"Could not load the local model from {MODEL_DIR} on the available devices. "
+            f"Check that the download finished and PyTorch is compatible. Details: {details}"
+        )
 
 
 def _whole_number(value: int | float, label: str) -> int:
@@ -117,12 +131,17 @@ def generate(
         raise gr.Error("Prompt strength must be between 1 and 12.")
     if seed < -1:
         raise gr.Error("Use -1 for a random seed, or enter 0 or a positive number.")
+    if seed > 2**53 - 1:
+        raise gr.Error("Seed is too large for the browser. Use a value up to 9007199254740991.")
 
     style_description = STYLE_PRESETS.get(style or "No extra style")
     final_prompt = f"{prompt}, {style_description}" if style_description else prompt
     pipe, device = get_pipeline()
     actual_seed = seed if seed >= 0 else int(torch.randint(0, 2**31 - 1, (1,)).item())
-    generator = torch.Generator(device=device).manual_seed(actual_seed)
+    try:
+        generator = torch.Generator(device=device).manual_seed(actual_seed)
+    except Exception as exc:
+        raise gr.Error(f"Could not initialize random generation on {device}: {exc}") from exc
 
     try:
         # Diffusers pipelines share mutable scheduler state, so serialize simultaneous requests.
