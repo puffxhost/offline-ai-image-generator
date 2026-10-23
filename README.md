@@ -1,4 +1,4 @@
-# Offline Image Studio
+# Offline AI Image Generator
 
 Generate text-to-image artwork on your own computer. The model is downloaded once while you are online. After setup, the app loads the model from disk and generates images locally.
 
@@ -20,24 +20,24 @@ Run these commands in the terminal you normally use.
 ### Windows CMD
 
 ~~~cmd
-git clone https://github.com/puffxhost/offline-image-studio.git
-cd offline-image-studio
+git clone https://github.com/puffxhost/offline-ai-image-generator.git
+cd offline-ai-image-generator
 py -3.11 --version
 ~~~
 
 ### Windows PowerShell
 
 ~~~powershell
-git clone https://github.com/puffxhost/offline-image-studio.git
-cd offline-image-studio
+git clone https://github.com/puffxhost/offline-ai-image-generator.git
+cd offline-ai-image-generator
 py -3.11 --version
 ~~~
 
 ### macOS or Linux Terminal
 
 ~~~bash
-git clone https://github.com/puffxhost/offline-image-studio.git
-cd offline-image-studio
+git clone https://github.com/puffxhost/offline-ai-image-generator.git
+cd offline-ai-image-generator
 python3.11 --version
 ~~~
 
@@ -200,8 +200,8 @@ Restart Windows if requested, then open Ubuntu from the Start menu and create yo
 ~~~bash
 sudo apt update
 sudo apt install -y git python3 python3-venv python3-pip
-git clone https://github.com/puffxhost/offline-image-studio.git
-cd offline-image-studio
+git clone https://github.com/puffxhost/offline-ai-image-generator.git
+cd offline-ai-image-generator
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -350,7 +350,7 @@ If you found this project useful, please consider giving it a star on GitHub to 
 
 ## 🔗 About
 
-Offline Image Studio is a local text-to-image app. Download the model once, then generate images on your own computer without sending prompts to a hosted image-generation service.
+Type what picture you want, and this app creates it on your computer with AI. Set it up and download the AI model once while online; after that, you can make pictures without internet.
 
 ## 🧠 Developed By
 
