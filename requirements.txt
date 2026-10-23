@@ -1,0 +1,10 @@
+# Install PyTorch separately for your operating system and hardware, following
+# https://pytorch.org/get-started/locally/ (CPU, CUDA, or Apple Silicon).
+# Then install this file: python -m pip install -r requirements.txt
+
+diffusers>=0.32.0
+transformers>=4.46.0
+accelerate>=1.0.0
+safetensors>=0.4.5
+huggingface_hub>=0.26.0
+gradio>=5.0.0
