@@ -1,6 +1,7 @@
 """Local-only text-to-image app. Model files must already exist on disk."""
 from __future__ import annotations
 
+import gc
 import os
 from pathlib import Path
 from threading import Lock
@@ -81,7 +82,7 @@ def get_pipeline() -> tuple[StableDiffusionPipeline, str]:
                     except Exception:
                         pass
 
-        details = "\\n".join(load_errors)
+        details = "\n".join(load_errors)
         raise gr.Error(
             f"Could not load the local model from {MODEL_DIR} on the available devices. "
             f"Check that the download finished and PyTorch is compatible. Details: {details}"
