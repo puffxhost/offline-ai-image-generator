@@ -95,8 +95,8 @@ def generate(prompt: str, negative_prompt: str, steps: int, guidance: float, see
 with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as demo:
     gr.Markdown(
         "# Offline AI Image Generator\n"
-        "Generate images locally. Your prompt and images stay on this computer. "
-        "The model must be downloaded once before disconnecting."
+        "Write what picture you want, and AI will make it on this computer. "
+        "Download the AI model once while online; then you can use the app without internet."
     )
     with gr.Row():
         with gr.Column(scale=1):
