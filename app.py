@@ -81,6 +81,11 @@ def get_pipeline() -> tuple[StableDiffusionPipeline, str]:
                         torch.cuda.empty_cache()
                     except Exception:
                         pass
+                elif device == "mps" and hasattr(torch, "mps") and hasattr(torch.mps, "empty_cache"):
+                    try:
+                        torch.mps.empty_cache()
+                    except Exception:
+                        pass
 
         details = "\n".join(load_errors)
         raise gr.Error(
