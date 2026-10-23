@@ -92,9 +92,9 @@ def generate(prompt: str, negative_prompt: str, steps: int, guidance: float, see
     return str(path), f"Saved {path}\nSeed: {actual_seed} · Device: {device}"
 
 
-with gr.Blocks(title="Offline Image Studio", theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as demo:
     gr.Markdown(
-        "# Offline Image Studio\n"
+        "# Offline AI Image Generator\n"
         "Generate images locally. Your prompt and images stay on this computer. "
         "The model must be downloaded once before disconnecting."
     )
