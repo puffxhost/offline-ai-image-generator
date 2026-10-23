@@ -327,9 +327,35 @@ This repository's code is MIT licensed. The default model has a separate [Creati
 
 Stable Diffusion v1.5 is primarily trained on English prompts and has known limitations and biases. The app keeps Diffusers' default safety checker enabled.
 
-## License
+## 🛟 Support & Contact
 
-The app code is distributed under the MIT License in LICENSE. Model weights are downloaded separately and are not covered by this repository's code license.
+Need help or want to report an issue?
+
+- 🌐 Website: [puffxhost.com/contact](https://puffxhost.com/contact)
+- 📧 Email: [support@puffxhost.in](mailto:support@puffxhost.in)
+- 📞 WhatsApp: [+91 8602967573](https://wa.me/918602967573)
+
+## 📜 License
+
+This project’s app code is licensed under the MIT License.
+See the LICENSE file for full details. Model weights have separate license terms; see the model license section above.
+
+## 🙌 Contributing
+
+Contributions are welcome! Fork the repository, make your changes, and submit a pull request.
+
+## ⭐️ Give a Star
+
+If you found this project useful, please consider giving it a star on GitHub to support its development.
+
+## 🔗 About
+
+Offline Image Studio is a local text-to-image app. Download the model once, then generate images on your own computer without sending prompts to a hosted image-generation service.
+
+## 🧠 Developed By
+
+**Nitin Mehta**  
+Official site: [puffxhost.com](https://puffxhost.com)
 
 ---
 
