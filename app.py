@@ -156,12 +156,12 @@ def generate(
         raise gr.Error(f"Could not save the image to {OUTPUT_DIR}. Check that the folder is writable.") from exc
 
     style_label = style if style in STYLE_PRESETS else "No extra style"
-    return str(path), f"Saved: {path}\\nSeed: {actual_seed} · Device: {device} · Style: {style_label}"
+    return str(path), f"Saved: {path}\nSeed: {actual_seed} · Device: {device} · Style: {style_label}"
 
 
 with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as demo:
     gr.Markdown(
-        "# Offline AI Image Generator\\n"
+        "# Offline AI Image Generator\n"
         "Write what picture you want, choose an optional art style, and generate it on this computer. "
         "After the one-time model download, it works without internet."
     )
