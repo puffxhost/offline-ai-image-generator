@@ -157,7 +157,7 @@ You only need to download the model once. On later sessions:
 2. Change to the cloned project folder, for example:
 
 ~~~cmd
-cd path\to\offline-image-studio
+cd path\to\offline-ai-image-generator
 ~~~
 
 3. Activate the environment using the command for your terminal:
