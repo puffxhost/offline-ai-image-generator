@@ -160,12 +160,12 @@ python app.py
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860) in your browser. If the browser does not open automatically, enter that address yourself.
 
-1. Type what you want to see, or click one of the example ideas. This model follows English prompts best.
-2. Optionally list things to avoid, such as "blurry" or "extra fingers."
-3. Choose an art style, such as watercolor, anime, or photorealistic.
-4. Start with 512 × 512; larger images need more memory.
-5. Leave seed at -1 for a different result each time, or reuse a whole number from 0 to 9007199254740991 to make a similar result again.
-6. Select Generate image. The first generation can take longer while the model loads. The app shows the seed, device, and style, and saves a PNG in the outputs folder.
+1. Choose a downloaded model in the AI model menu. The app can only use models already downloaded to the models folder.\n2. Type what you want to see, or click one of the example ideas. Most catalog models follow English prompts best.
+3. Optionally list things to avoid, such as "blurry" or "extra fingers."
+4. Choose an art style, such as watercolor, anime, or photorealistic.
+5. Start with 512 × 512; larger images need more memory.
+6. Leave seed at -1 for a different result each time, or reuse a whole number from 0 to 9007199254740991 to make a similar result again.
+7. Select Generate image. The first generation can take longer while the model loads. The app shows the seed, device, and style, and saves a PNG in the outputs folder.
 
 The app listens on your own computer at 127.0.0.1, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. It does not send prompts or generated images to a hosted inference service.
 
