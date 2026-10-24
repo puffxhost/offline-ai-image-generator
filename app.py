@@ -62,7 +62,7 @@ def _clear_device_cache(device: str | None = None) -> None:
             pass
 
 
-def get_pipeline(model_key: str):
+def get_pipeline(model_key: str, force_cpu: bool = False):
     global _pipeline, _pipeline_model
     if model_key not in MODEL_CATALOG:
         raise gr.Error("Choose one of the supported models.")
@@ -76,19 +76,24 @@ def get_pipeline(model_key: str):
 
     with _pipeline_lock:
         if _pipeline is not None and _pipeline_model == model_key:
-            return _pipeline, str(_pipeline._execution_device)
+            loaded_device = str(_pipeline._execution_device)
+            if not force_cpu or loaded_device == "cpu":
+                return _pipeline, loaded_device
 
         previous_device = str(_pipeline._execution_device) if _pipeline is not None else None
         _pipeline = None
         _pipeline_model = None
         _clear_device_cache(previous_device)
 
-        device_options = []
-        if torch.cuda.is_available():
-            device_options.append(("cuda", torch.float16))
-        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-            device_options.append(("mps", torch.float16))
-        device_options.append(("cpu", torch.float32))
+        if force_cpu:
+            device_options = [("cpu", torch.float32)]
+        else:
+            device_options = []
+            if torch.cuda.is_available():
+                device_options.append(("cuda", torch.float16))
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                device_options.append(("mps", torch.float16))
+            device_options.append(("cpu", torch.float32))
 
         load_errors = []
         for device, dtype in device_options:
@@ -151,6 +156,7 @@ def generate(
     width: int,
     height: int,
 ):
+    global _pipeline, _pipeline_model
     if model_key not in MODEL_CATALOG:
         raise gr.Error("Choose one of the supported models.")
     step_min, step_max, _ = MODEL_CATALOG[model_key]["steps"]
@@ -196,15 +202,42 @@ def generate(
                 generator = torch.Generator(device=device).manual_seed(actual_seed)
             except Exception as exc:
                 raise gr.Error(f"Could not initialize random generation on {device}: {exc}") from exc
-            result = pipe(
-                prompt=final_prompt,
-                negative_prompt=(negative_prompt or "").strip() or None,
-                num_inference_steps=steps,
-                guidance_scale=guidance,
-                width=width,
-                height=height,
-                generator=generator,
-            )
+            try:
+                result = pipe(
+                    prompt=final_prompt,
+                    negative_prompt=(negative_prompt or "").strip() or None,
+                    num_inference_steps=steps,
+                    guidance_scale=guidance,
+                    width=width,
+                    height=height,
+                    generator=generator,
+                )
+            except RuntimeError as exc:
+                is_oom = "out of memory" in str(exc).lower()
+                if not is_oom or device not in {"cuda", "mps"}:
+                    raise
+
+                failed_device = device
+                _pipeline = None
+                _pipeline_model = None
+                del pipe
+                _clear_device_cache(failed_device)
+                try:
+                    pipe, device = get_pipeline(model_key, force_cpu=True)
+                    generator = torch.Generator(device=device).manual_seed(actual_seed)
+                    result = pipe(
+                        prompt=final_prompt,
+                        negative_prompt=(negative_prompt or "").strip() or None,
+                        num_inference_steps=steps,
+                        guidance_scale=guidance,
+                        width=width,
+                        height=height,
+                        generator=generator,
+                    )
+                except Exception as fallback_exc:
+                    raise gr.Error(
+                        f"Not enough memory on {failed_device}; CPU retry also failed: {fallback_exc}"
+                    ) from fallback_exc
         image = result.images[0]
     except gr.Error:
         raise
