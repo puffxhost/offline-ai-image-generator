@@ -176,24 +176,23 @@ python app.py
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860). If the browser does not open automatically, enter that address yourself.
 
-1. Choose a model you have downloaded from **AI model**. The selected model stays chosen for this run.
-2. Write your idea in **What picture should AI make?** Include the subject, setting, lighting, and mood. Click a prompt chip to start from an example.
+1. Choose a downloaded model from **AI model**. The selected model stays active for this run.
+2. Write your idea in **What picture should AI make?** Include the subject, setting, lighting, and mood. Click an example to start with a prompt.
 3. Optionally enter **Things to avoid**, such as `blurry`, `text`, or `watermark`.
-4. Pick an art style and composition, then adjust width, height, quality steps, and prompt strength if needed. Start at 512 × 512 when unsure.
-5. Choose **Images per batch** (1–4) and press **Generate**. Each image is saved as a PNG in `outputs/`; the gallery and status show the output and seed.
-6. After generation, select one of the prompt ideas to update your prompt and create another batch.
+4. Choose an art style, then adjust width, height, quality steps, and prompt strength if needed. Start at 512 × 512 when unsure.
+5. Choose **Images per batch** (1–4) and press **Generate**. Each image is saved as a PNG in `outputs/`; the gallery and status show the results and seeds.
+6. Open **Prompt suggestions for your next image** after generation to reuse one of four ideas.
 
-### Studio features
+### Available controls
 
-- A polished, single-screen image generator with the model and prompt controls easy to find.
-- A responsive two-column studio on desktop that stacks neatly on phones.
-- Twelve art directions, five composition presets, and model-aware size/detail controls.
-- One to four variations per batch, negative prompts, reproducible seeds, and four prompt ideas after generation.
-- A results gallery, local PNG saving, and developer support links.
+- The original single-screen generator layout keeps the model, prompt, and image settings together.
+- Twelve art directions, model-aware size/detail controls, negative prompts, and reproducible seeds.
+- One to four images per batch, a results gallery, PNG saving, and four optional prompt ideas.
+- Developer support links for Puffx Host.
 
 ### Switch models
 
-Use the **AI model** menu near the top of the Create panel and choose a model you have already downloaded. If you have not downloaded the model yet, run `python scripts/download_model.py --model <model-id>` from the repository folder, then restart the app and select it. The step, prompt-strength, and maximum-size controls are model-aware. XL models use more memory, so start at 512 × 512 if unsure.
+Use the **AI model** menu near the top of the screen and choose a model you have already downloaded. If you have not downloaded it yet, run `python scripts/download_model.py --model <model-id>` from the repository folder, then restart the app and select it. The step, prompt-strength, and maximum-size controls are model-aware. XL models use more memory, so start at 512 × 512 if unsure.
 
 The app listens on your own computer at `127.0.0.1`, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. Prompts and generated images are not sent to a hosted inference service.
 
