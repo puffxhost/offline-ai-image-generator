@@ -38,6 +38,7 @@ MODEL_CATALOG = {
         "size": "about 8 GB",
         "tier": "Large",
         "steps": (10, 50, 25),
+        "guidance": (1, 12, 7.5),
         "description": "Versatile illustrative and photorealistic styles.",
     },
     "sdxl-base-1.0": {
