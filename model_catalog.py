@@ -12,6 +12,7 @@ MODEL_CATALOG = {
         "size": "about 1.1 GB",
         "tier": "Small",
         "steps": (10, 50, 25),
+        "guidance": (1, 12, 7.5),
         "description": "Lowest storage and memory option; faster, lighter results.",
     },
     "stable-diffusion-v1-5": {
@@ -28,6 +29,7 @@ MODEL_CATALOG = {
         "size": "about 5.2 GB of model weights",
         "tier": "Medium",
         "steps": (1, 4, 2),
+        "guidance": (0, 2, 0.0),
         "description": "Fast generation; designed for very few steps.",
     },
     "dreamshaper-8": {
@@ -44,6 +46,7 @@ MODEL_CATALOG = {
         "size": "about 7 GB of model weights",
         "tier": "Large",
         "steps": (10, 50, 25),
+        "guidance": (1, 12, 5.0),
         "description": "Higher detail and native 1024-pixel output; needs more memory.",
     },
 }
