@@ -114,61 +114,78 @@ This installs Diffusers, Transformers, Gradio, and the model-loading libraries. 
 
 ## 5. Choose and download an AI model (internet required once)
 
-The app includes a model menu. Download whichever models you want while online; each one stays in its own folder, and you can switch models later from the app. You do not have to install all of them. Download size is disk space used by model files, not the RAM/VRAM requirement. Actual totals can vary with repository updates and file formats.
+The app supports the models below through the standard Diffusers text-to-image pipeline. There is no single best model for every computer: pick by the balance you want between speed, detail, and disk/RAM/VRAM. The download sizes are estimates. The downloader fetches Diffusers component folders and skips duplicate standalone checkpoint files where the model repository includes them, so actual transfer size may differ.
 
-| Model | Approximate model download | Best for | Notes |
+| Model | Download estimate | Good starting choice for | Notes |
 | --- | ---: | --- | --- |
-| [Segmind Tiny SD](https://huggingface.co/segmind/tiny-sd) (tiny-sd) | about 1.1 GB | Low disk space and lighter computers | Smallest option; expect simpler results. |
-| [Stable Diffusion 1.5](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5) (stable-diffusion-v1-5) | about 4.3 GB of weights | General-purpose images | Balanced default. |
-| [Stable Diffusion Turbo](https://huggingface.co/stabilityai/sd-turbo) (sd-turbo) | about 5.2 GB of weights | Faster drafts | Use 1–4 steps. Read Stability AI model terms. |
-| [Stable Diffusion XL Base 1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) (sdxl-base-1.0) | about 7 GB of weights | Detailed, larger images | Requires more memory; start at 512 × 512 if needed. |
-| [DreamShaper 8](https://huggingface.co/Lykon/dreamshaper-8) (dreamshaper-8) | about 8 GB | Illustrative and realistic styles | Larger download; review its model card and license. |
+| [Segmind Tiny SD](https://huggingface.co/segmind/tiny-sd) (`tiny-sd`) | about 1.1 GB | Low disk space and modest computers | Small and quick; image detail is simpler. |
+| [Stable Diffusion 1.5](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5) (`stable-diffusion-v1-5`) | about 4.3 GB | General-purpose starting point | Default model; wide support and a good speed/quality balance. |
+| [Stable Diffusion Turbo](https://huggingface.co/stabilityai/sd-turbo) (`sd-turbo`) | about 5.2 GB | Fast drafts | Designed for 1–4 steps; uses low prompt guidance. Check its model terms for your use. |
+| [Stable Diffusion XL Base 1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) (`sdxl-base-1.0`) | about 7 GB | More detail and complex scenes | Needs more memory than SD 1.5. Start at 512 × 512 or 640 × 640. |
+| [DreamShaper 8](https://huggingface.co/Lykon/dreamshaper-8) (`dreamshaper-8`) | about 8 GB | Illustrative and realistic styles | SD 1.5-based fine-tune with a flexible style range. |
+| [Segmind SSD-1B](https://huggingface.co/segmind/SSD-1B) (`ssd-1b`) | about 13–14 GB of Diffusers files | Detailed SDXL-style images with faster generation | Distilled SDXL family model; its card reports faster inference than SDXL Base. Apache 2.0 license. |
+| [DreamShaper XL](https://huggingface.co/Lykon/dreamshaper-xl-1-0) (`dreamshaper-xl`) | about 21 GB | High-detail creative, anime, or realistic images | Large SDXL fine-tune; requires plenty of free disk and memory. Review the model card license. |
 
-Sizes are approximate and can change. The downloader requests Diffusers component folders rather than unrelated checkpoint files that some model repositories keep alongside the pipeline. The exact transferred size can differ from these estimates.
+Sizes and performance vary by revision, file format, and computer. A large download does not mean it will fit in GPU memory. If unsure, start with Tiny SD or the default Stable Diffusion 1.5. For better detail on a capable computer, try SSD-1B or DreamShaper XL. Every model has its own license and usage terms; read its model card before downloading or using it.
 
-First, see the model IDs and descriptions:
+See the supported IDs and descriptions:
 
 ~~~bash
 python scripts/download_model.py --list
 ~~~
 
-Download only the model you want. For example, the smallest model:
+Download only the models you want, while online. For example:
 
 ~~~bash
-python scripts/download_model.py --model tiny-sd
+python scripts/download_model.py --model ssd-1b
+python scripts/download_model.py --model dreamshaper-xl
 ~~~
 
-Or download the default model:
+Use any ID in the table after `--model`. The files are stored separately under `models/<model-id>/`, so you can keep multiple models installed. For example, SSD-1B goes in `models/ssd-1b/`. Run one download command at a time. Leave the terminal open and connected until “Download complete” appears. If interrupted, run the same command again to resume.
+
+If a model host asks you to accept terms or sign in, complete that on the model page first. Do not put access tokens in this repository. Downloads can use a lot of disk space; check the model page for current files and terms before starting.
+
+### Switch between downloaded models
+
+1. Start the app with `python app.py` (or `docker compose up` for Docker).
+2. In the **AI model** menu, choose the model you want.
+3. Enter a prompt and press **Generate image**. The selected model loads from its local folder the first time it is used. The first generation can take several minutes.
+4. To switch, choose another model and generate again. The app unloads the previous model before loading the next one to reduce memory use.
+5. Keep the internet disconnected for offline use. A model must already be downloaded on this computer; choosing an uninstalled model shows its ID and download command.
+
+Downloading a model does not change the app code or replace the other model folders. You can switch back any time by choosing that model again. If the model download is incomplete, rerun its download command while connected to the internet.
+
+### Download a model for Docker
+
+The native Python downloader and Docker share the same `models/` folder. For the new model choices in this checkout, first build the updated app image, then download a model before disconnecting:
 
 ~~~bash
-python scripts/download_model.py
+docker compose build
+docker compose run --rm puffx-ai-image-generator python scripts/download_model.py --model ssd-1b
 ~~~
 
-To download another choice, replace the ID with sd-turbo, sdxl-base-1.0, or dreamshaper-8. Downloads go into models/<model-id>/; for example, Tiny SD is stored in models/tiny-sd/. You need enough free disk space for every model you choose and your generated images. Keep the terminal open and internet connected until it prints “Download complete.” If interrupted, rerun the same command to resume.
+Replace `ssd-1b` with another model ID from the table. Repeat the command to install more models. Then start the app with `docker compose up` and select the downloaded model in the menu. Docker is CPU-only in this project, so large SDXL models may be very slow or may need more system memory than your computer has.
 
-The model chooser appears in the app after launch. You can install several models, choose one from the AI model menu, and change the selection later. Switching unloads the previous pipeline before loading the next model to reduce memory use. Initial loading may take a few minutes. The selected model must already be downloaded to work offline.
+## 6. Generate images and use the controls
 
-If a model host asks you to accept terms or sign in, follow the model card instructions. Never put access tokens in this repository. Check each model license and acceptable-use terms before use.
-
-## 6. Start generating images
-
-You can now disconnect from the internet. From the repository folder, with the virtual environment active, run:
+Start the app from the repository folder, with the virtual environment active:
 
 ~~~bash
 python app.py
 ~~~
 
-Open [http://127.0.0.1:7860](http://127.0.0.1:7860) in your browser. If the browser does not open automatically, enter that address yourself.
+Open [http://127.0.0.1:7860](http://127.0.0.1:7860). If the browser does not open automatically, enter that address yourself.
 
-1. Choose a downloaded model in the AI model menu. The app can only use models already downloaded to the models folder.
-2. Type what you want to see, or click one of the example ideas. Most catalog models follow English prompts best.
-3. Optionally list things to avoid, such as "blurry" or "extra fingers."
-4. Choose an art style, such as watercolor, anime, or photorealistic.
-5. Start with 512 × 512; larger images need more memory.
-6. Leave seed at -1 for a different result each time, or reuse a whole number from 0 to 9007199254740991 to make a similar result again.
-7. Select Generate image. The first generation can take longer while the model loads. The app shows the seed, device, and style, and saves a PNG in the outputs folder.
+1. Choose a model that you have already downloaded.
+2. Write a clear prompt describing the subject, setting, lighting, and style. The catalog models generally respond best to English prompts.
+3. Optionally enter a negative prompt with details to avoid, such as `blurry` or `extra fingers`. Turbo models are designed for low or no guidance; follow their model-card recommendations.
+4. Choose an art-style preset, or leave **No extra style**.
+5. Start at 512 × 512. The app currently allows widths and heights from 256 to 768 pixels, in multiples of 8. Higher values need more memory.
+6. Choose the step count and prompt strength. The controls update when you switch models; the app validates values against that model's supported range.
+7. Leave seed at `-1` for a random seed, or reuse a whole-number seed to get a similar result later.
+8. Press **Generate image**. The output appears in the app and is saved as a PNG in `outputs/`. The status shows the seed and device used.
 
-The app listens on your own computer at 127.0.0.1, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. It does not send prompts or generated images to a hosted inference service.
+The app listens on your own computer at `127.0.0.1`, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. Prompts and generated images are not sent to a hosted inference service.
 
 ## 7. Use it again later
 
@@ -236,7 +253,7 @@ For better file performance, keep the project inside the WSL Linux filesystem (f
 
 **Puffx Host** provides a CPU-only Docker image for computers with Docker installed. CPU image generation can be slow. Apple Silicon/MPS and NVIDIA CUDA acceleration are not configured in this container; use a native installation for GPU acceleration.
 
-The image is published to [GitHub Container Registry](https://github.com/puffxhost/offline-ai-image-generator/pkgs/container/offline-ai-image-generator) when a stable GitHub Release is published. It contains the app and CPU PyTorch, but **not the Stable Diffusion model weights**. The model is downloaded separately into a folder on your computer, so you keep control of the model files and can use them offline.
+The image is published to [GitHub Container Registry](https://github.com/puffxhost/offline-ai-image-generator/pkgs/container/offline-ai-image-generator) when a stable GitHub Release is published. It contains the app and CPU PyTorch, but **not the Stable Diffusion model weights**. The model is downloaded separately into a folder on your computer, so you keep control of the model files and can use them offline. The published image may not yet include model choices added after its release. To use the current repository's full model catalog, build the image locally with `docker compose build` before downloading models.
 
 Install Docker Desktop on Windows/macOS, or Docker Engine and the Compose plugin on Linux. Clone this repository as described above, open a terminal in the repository folder, and pull the prebuilt image while online:
 
