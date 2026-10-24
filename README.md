@@ -176,28 +176,25 @@ python app.py
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860). If the browser does not open automatically, enter that address yourself.
 
-1. Choose a model that you have already downloaded.
-2. Write a clear prompt describing the subject, setting, lighting, and style. The catalog models generally respond best to English prompts.
-3. Optionally enter a negative prompt with details to avoid, such as `blurry` or `extra fingers`. Turbo models are designed for low or no guidance; follow their model-card recommendations.
-4. Choose an art-style preset, or leave **No extra style**.
-5. Start at 512 × 512. Standard models allow widths and heights from 256 to 768 pixels; SDXL models allow up to 1024 pixels. Values must be multiples of 8, and larger images need substantially more memory.
-6. Choose the step count and prompt strength. The controls update when you switch models; the app validates values against that model's supported range.
-7. Leave seed at `-1` for a random seed, or reuse a whole-number seed to get a similar result later.
-8. Choose **Variations** (1–4) to make several results in one batch, then press **Generate images**. Each image is saved as a PNG in `outputs/`; the gallery shows each seed and the status reports the chosen settings.
-9. After generation, use one of the **Prompt sparks** buttons to copy a suggested direction into your prompt and generate another take.
+1. The app opens in **Simple** mode. Write a prompt in your own words, choose how many images to create (1–4), and press **Generate**. A model is selected for you automatically.
+2. Use a quick idea chip if you want a prompt starter. The catalog models generally respond best to English prompts.
+3. Switch to **Advanced** only when you want to choose a downloaded model, style, composition, avoid prompt, dimensions, detail steps, prompt strength, or seed.
+4. In Advanced mode, leave seed at `-1` for a random result, or reuse a whole-number seed for a similar result later. Standard models support dimensions from 256 to 768 pixels; SDXL models support up to 1024 pixels. Larger images need substantially more memory.
+5. Generate 1–4 variations in either mode. Each image is saved as a PNG in `outputs/`; the gallery and status show the results and seeds.
+6. After generation, choose one of the prompt ideas to update your prompt and make another set.
 
 ### Studio features
 
-- A responsive dark studio layout with separate creation and results panels.
-- Twelve art directions, including photorealistic, anime, watercolor, cinematic, 3D render, product photo, oil painting, concept art, and fashion editorial.
-- Composition presets for square, portrait, landscape, wide, and story formats. Width and height remain editable.
-- One to four variations per batch, reproducible seeds, negative prompts, and model-aware detail/guidance controls.
-- Prompt sparks after each batch to help explore close-up, cinematic, or editorial versions.
+- A focused, chat-inspired prompt screen in Simple mode, with one prompt box and multi-image generation.
+- Advanced mode reveals optional controls instead of crowding the main screen.
+- A responsive layout for phones, tablets, and desktop screens.
+- Twelve art directions and five composition presets in Advanced mode.
+- Model-aware detail controls, reproducible seeds, negative prompts, and prompt sparks.
 - A results gallery, local PNG saving, and developer support links.
 
 ### Switch models
 
-Download any model once using the matching ID from the model table in section 5. To change models later, start the app, open the **Model** menu at the top of the Create panel, and choose a downloaded model. If you choose a model you have not downloaded yet, stop the app, download it with `python scripts/download_model.py --model <model-id>`, then restart and select it. Model-specific step, prompt-strength, and maximum-size controls update when you switch. Keep in mind XL models use more memory; start with 512 × 512 if unsure.
+Start the app and select **Advanced**. Open the **AI model** menu and choose a downloaded model. If you have not downloaded it yet, run `python scripts/download_model.py --model <model-id>`, then reopen the app and select it. The selected model controls its available steps, prompt strength, and maximum image size. XL models use more memory, so start at 512 × 512 if unsure.
 
 The app listens on your own computer at `127.0.0.1`, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. Prompts and generated images are not sent to a hosted inference service.
 
