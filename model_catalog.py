@@ -50,6 +50,7 @@ MODEL_CATALOG = {
         "steps": (10, 50, 30),
         "guidance": (1, 12, 9.0),
         "description": "Distilled SDXL-style model for faster generation with strong detail.",
+        "max_resolution": 1024,
     },
     "dreamshaper-xl": {
         "name": "DreamShaper XL",
@@ -59,6 +60,7 @@ MODEL_CATALOG = {
         "steps": (10, 50, 30),
         "guidance": (1, 12, 7.5),
         "description": "High-detail SDXL fine-tune for creative, anime, and realistic images.",
+        "max_resolution": 1024,
     },
     "sdxl-base-1.0": {
         "name": "Stable Diffusion XL Base 1.0",
@@ -68,6 +70,7 @@ MODEL_CATALOG = {
         "steps": (10, 50, 25),
         "guidance": (1, 12, 5.0),
         "description": "Higher detail and native 1024-pixel output; needs more memory.",
+        "max_resolution": 1024,
     },
 }
 

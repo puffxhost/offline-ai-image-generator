@@ -180,7 +180,7 @@ Open [http://127.0.0.1:7860](http://127.0.0.1:7860). If the browser does not ope
 2. Write a clear prompt describing the subject, setting, lighting, and style. The catalog models generally respond best to English prompts.
 3. Optionally enter a negative prompt with details to avoid, such as `blurry` or `extra fingers`. Turbo models are designed for low or no guidance; follow their model-card recommendations.
 4. Choose an art-style preset, or leave **No extra style**.
-5. Start at 512 × 512. The app currently allows widths and heights from 256 to 768 pixels, in multiples of 8. Higher values need more memory.
+5. Start at 512 × 512. Standard models allow widths and heights from 256 to 768 pixels; SDXL models allow up to 1024 pixels. Values must be multiples of 8, and larger images need substantially more memory.
 6. Choose the step count and prompt strength. The controls update when you switch models; the app validates values against that model's supported range.
 7. Leave seed at `-1` for a random seed, or reuse a whole-number seed to get a similar result later.
 8. Press **Generate image**. The output appears in the app and is saved as a PNG in `outputs/`. The status shows the seed and device used.
