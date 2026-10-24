@@ -8,8 +8,8 @@ services:
     environment:
       HOST: "0.0.0.0"
       PORT: "7860"
-      MODEL_DIR: "/models/stable-diffusion-v1-5"
+      MODEL_ROOT: "/models"
       OUTPUT_DIR: "/outputs"
     volumes:
-      - ./models/stable-diffusion-v1-5:/models/stable-diffusion-v1-5
+      - ./models:/models
       - ./outputs:/outputs
