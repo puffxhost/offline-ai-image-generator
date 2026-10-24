@@ -50,7 +50,7 @@ def model_directory(model_key: str) -> Path:
 
 def _clear_device_cache(device: str | None = None) -> None:
     gc.collect()
-    if device == "cuda" or (device is None and torch.cuda.is_available()):
+    if (device and device.startswith("cuda")) or (device is None and torch.cuda.is_available()):
         try:
             torch.cuda.empty_cache()
         except Exception:
@@ -130,6 +130,16 @@ def _whole_number(value: int | float, label: str) -> int:
     return number
 
 
+def update_model_controls(model_key: str):
+    settings = MODEL_CATALOG.get(model_key, MODEL_CATALOG[DEFAULT_MODEL])
+    step_min, step_max, step_default = settings["steps"]
+    guidance_min, guidance_max, guidance_default = settings["guidance"]
+    return (
+        gr.update(minimum=step_min, maximum=step_max, value=step_default),
+        gr.update(minimum=guidance_min, maximum=guidance_max, value=guidance_default),
+    )
+
+
 def generate(
     model_key: str,
     prompt: str,
@@ -158,10 +168,12 @@ def generate(
         raise gr.Error("Width must be between 256 and 768 pixels, in multiples of 8.")
     if not 256 <= height <= 768 or height % 8:
         raise gr.Error("Height must be between 256 and 768 pixels, in multiples of 8.")
-    if not 10 <= steps <= 50:
-        raise gr.Error("Steps must be between 10 and 50.")
-    if not 1 <= guidance <= 12:
-        raise gr.Error("Prompt strength must be between 1 and 12.")
+    if not step_min <= steps <= step_max:
+        model_name = MODEL_CATALOG[model_key]["name"]
+        raise gr.Error(f"Steps for {model_name} must be between {step_min} and {step_max}.")
+    if not guidance_min <= guidance <= guidance_max:
+        model_name = MODEL_CATALOG[model_key]["name"]
+        raise gr.Error(f"Prompt strength for {model_name} must be between {guidance_min} and {guidance_max}.")
     if seed < -1:
         raise gr.Error("Use -1 for a random seed, or enter 0 or a positive number.")
     if seed > 2**53 - 1:
@@ -171,6 +183,8 @@ def generate(
     final_prompt = f"{prompt}, {style_description}" if style_description else prompt
     if model_key not in MODEL_CATALOG:
         raise gr.Error("Choose one of the supported models.")
+    step_min, step_max, _ = MODEL_CATALOG[model_key]["steps"]
+    guidance_min, guidance_max, _ = MODEL_CATALOG[model_key]["guidance"]
     actual_seed = seed if seed >= 0 else int(torch.randint(0, 2**31 - 1, (1,)).item())
     try:
         generator = torch.Generator(device=device).manual_seed(actual_seed)
@@ -261,13 +275,18 @@ with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as de
                 width = gr.Slider(256, 768, value=512, step=64, label="Width")
                 height = gr.Slider(256, 768, value=512, step=64, label="Height")
             with gr.Row():
-                steps = gr.Slider(10, 50, value=25, step=1, label="Quality steps")
-                guidance = gr.Slider(1, 12, value=7.5, step=0.5, label="Prompt strength")
+                steps = gr.Slider(1, 50, value=25, step=1, label="Quality steps")
+                guidance = gr.Slider(0, 12, value=7.5, step=0.5, label="Prompt strength")
             seed = gr.Number(value=-1, precision=0, label="Seed (-1 = random)")
             run = gr.Button("Generate image", variant="primary")
         with gr.Column(scale=1):
             image = gr.Image(label="Your AI image", type="filepath")
             status = gr.Textbox(label="Saved image details", interactive=False)
+    model.change(
+        update_model_controls,
+        inputs=[model],
+        outputs=[steps, guidance],
+    )
     run.click(
         generate,
         [model, prompt, negative, style, steps, guidance, seed, width, height],
