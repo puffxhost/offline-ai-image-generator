@@ -21,6 +21,7 @@ MODEL_CATALOG = {
         "size": "about 4.3 GB of model weights",
         "tier": "Medium",
         "steps": (10, 50, 25),
+        "guidance": (1, 12, 7.5),
         "description": "Balanced general-purpose model; default selection.",
     },
     "sd-turbo": {
