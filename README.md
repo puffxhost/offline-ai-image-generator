@@ -365,6 +365,3 @@ Made with ❤️ by Nitin Mehta.
 
 - 💬 WhatsApp: [+91 7354336624](https://wa.me/917354336624)
 
-## 📜 License
-
-This project’s app code is licensed under the MIT License. See the [LICENSE](LICENSE) file for full details. Model weights have separate license terms; see the model license section above.
