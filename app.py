@@ -569,11 +569,3 @@ if __name__ == "__main__":
         inbrowser=True,
     )
 
-
-if __name__ == "__main__":
-    demo.launch(
-        server_name=os.environ.get("HOST", "127.0.0.1"),
-        server_port=int(os.environ.get("PORT", "7860")),
-        share=False,
-        inbrowser=True,
-    )
