@@ -1,6 +1,8 @@
 services:
   offline-image-studio:
+    image: ghcr.io/puffxhost/offline-ai-image-generator:latest
     build: .
+    pull_policy: missing
     ports:
       - "127.0.0.1:7860:7860"
     environment:
