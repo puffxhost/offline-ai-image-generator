@@ -213,9 +213,17 @@ For better file performance, keep the project inside the WSL Linux filesystem (f
 
 ### Docker (CPU mode)
 
-The repository includes a Dockerfile and Compose file for a CPU-only container. This is useful when Docker is installed and you want an isolated environment. CPU generation may be slow. For Apple Silicon/MPS or NVIDIA CUDA performance, install and run the app natively using the OS instructions above.
+The repository provides a CPU-only Docker image for computers with Docker installed. CPU image generation can be slow. Apple Silicon/MPS and NVIDIA CUDA acceleration are not configured in this container; use a native installation for GPU acceleration.
 
-Install Docker Desktop on Windows/macOS, or Docker Engine and the Compose plugin on Linux. Start Docker, open a terminal in the cloned repository, and build the image while online:
+The image is published to [GitHub Container Registry](https://github.com/puffxhost/offline-ai-image-generator/pkgs/container/offline-ai-image-generator) when a stable GitHub Release is published. It contains the app and CPU PyTorch, but **not the Stable Diffusion model weights**. The model is downloaded separately into a folder on your computer, so you keep control of the model files and can use them offline.
+
+Install Docker Desktop on Windows/macOS, or Docker Engine and the Compose plugin on Linux. Clone this repository as described above, open a terminal in the repository folder, and pull the prebuilt image while online:
+
+~~~bash
+docker compose pull
+~~~
+
+If you prefer to build the image locally instead, use:
 
 ~~~bash
 docker compose build
@@ -227,16 +235,17 @@ Download the model into the mounted models folder while online:
 docker compose run --rm offline-image-studio python scripts/download_model.py
 ~~~
 
-Then disconnect from the internet and start the app:
+When the script prints “Download complete,” disconnect from the internet and start the app:
 
 ~~~bash
 docker compose up
 ~~~
 
-Open http://127.0.0.1:7860 in your browser. Images are saved in the repository's outputs folder. Press Ctrl+C to stop; use docker compose down to stop and remove the container. The model and output folders are stored on your computer and remain there. On later runs, use docker compose up.
+Open http://127.0.0.1:7860 in your browser. Images are saved in the repository's outputs folder. Press Ctrl+C to stop; use `docker compose down` to stop the container. The model and output folders remain on your computer. On later runs, use `docker compose up`; the container image, model, and generated images are stored separately.
 
-The Docker image uses CPU PyTorch. Building the image and downloading the model require internet once. Docker GPU support is not configured by these files; use a native CUDA installation or WSL2 for NVIDIA GPU acceleration.
+The package publishes `latest`, `1`, `1.0`, and `1.0.0` tags for release `v1.0.0`. For a later release, the matching version tags are published automatically. To pin a specific version, set `image: ghcr.io/puffxhost/offline-ai-image-generator:1.0.0` in `compose.yaml`.
 
+Building the image or downloading the model requires internet once. The prebuilt CPU image supports `linux/amd64`; the model weights are several GB and must be downloaded separately. For completely offline use, pull/build the image and finish the model download before disconnecting.
 ### Cloud notebooks and remote machines
 
 Google Colab, Kaggle notebooks, and hosted virtual machines can run Python apps, but they are not a reliable way to meet the offline goal: they need internet to set up, may reset their storage, and run on someone else's computer. Use a cloud notebook only when you are okay with those limits.
