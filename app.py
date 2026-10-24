@@ -174,8 +174,8 @@ def prompt_suggestions(prompt: str, style: str) -> list[str]:
         f"{prompt}, cinematic composition, soft directional lighting, rich visual detail{suffix}",
         f"{prompt}, editorial framing, atmospheric depth, balanced colors, polished finish{suffix}",
         f"{prompt}, close-up subject focus, beautiful natural light, intricate texture{suffix}",
+        f"{prompt}, dreamy atmosphere, elegant color palette, subtle background details{suffix}",
     ]
-
 
 def _generate_one(
     model_key: str,
@@ -337,171 +337,199 @@ def generate(
 
 
 APP_CSS = r"""
-.gradio-container { max-width: 1080px !important; background: radial-gradient(ellipse at 15% 0%,rgba(99,102,241,.15),transparent 34%),radial-gradient(ellipse at 90% 4%,rgba(34,211,238,.08),transparent 25%),#080b14; color:#eef2ff; }
-body { background:#080b14 !important; }
-#hero { padding:25px 28px 20px; border:1px solid rgba(148,163,184,.15); border-radius:24px; background:linear-gradient(120deg,rgba(20,27,48,.96),rgba(13,22,38,.94)); box-shadow:0 18px 55px rgba(0,0,0,.22); margin:12px 0 14px; }
-#hero .eyebrow { color:#a5b4fc; text-transform:uppercase; letter-spacing:.16em; font-size:11px; font-weight:800; }
-#hero h1 { color:#f8fafc; font-size:clamp(27px,4vw,42px); line-height:1.08; margin:8px 0; }
-#hero p { max-width:680px; color:#aab7ce; font-size:14px; line-height:1.55; margin:0; }
-#mode-row { display:flex; justify-content:center; margin:12px auto; max-width:420px; }
-#mode-row label { border-radius:14px !important; }
-#composer, #results-panel { border:1px solid rgba(148,163,184,.16) !important; border-radius:22px !important; background:rgba(15,20,34,.92) !important; padding:20px !important; box-shadow:0 14px 42px rgba(0,0,0,.2); }
-#composer textarea { border-radius:15px !important; min-height:120px !important; font-size:16px !important; line-height:1.55 !important; }
-#composer input, #composer select { border-radius:12px !important; }
-#idea-row { gap:8px; margin:6px 0 10px; }
-#idea-row button { border-radius:999px !important; font-size:11px !important; padding:7px 10px !important; }
-#advanced-panel { margin-top:12px; padding:14px; border:1px solid rgba(148,163,184,.14); border-radius:16px; background:rgba(9,14,25,.55); }
-#generate-button button { min-height:52px; border-radius:14px !important; font-size:15px !important; font-weight:800 !important; color:white !important; background:linear-gradient(100deg,#6366f1,#8b5cf6 55%,#06b6d4) !important; border:0 !important; box-shadow:0 10px 28px rgba(99,102,241,.23); }
+.gradio-container {
+    max-width: 1340px !important;
+    padding: 20px 24px 34px !important;
+    background:
+      radial-gradient(ellipse at 10% 0%, rgba(106, 92, 255, .17), transparent 34%),
+      radial-gradient(ellipse at 91% 7%, rgba(48, 197, 214, .11), transparent 26%),
+      #080b14;
+    color: #eef2ff;
+}
+body { background: #080b14 !important; }
+#brandbar { display:flex; align-items:center; justify-content:space-between; padding:0 4px 16px; }
+#brandbar .brand { display:flex; align-items:center; gap:10px; color:#f8fafc; font-weight:800; letter-spacing:.01em; }
+#brandbar .brand-mark { width:34px; height:34px; display:grid; place-items:center; border-radius:11px; color:white; background:linear-gradient(135deg,#7769f7,#23bfd1); box-shadow:0 7px 22px #6657ef55; font-size:18px; }
+#brandbar .local-badge { color:#a8c8c6; background:#14302c88; border:1px solid #39bda54b; border-radius:999px; padding:6px 10px; font-size:11px; }
+#hero { padding:22px 26px; border:1px solid rgba(148,163,184,.15); border-radius:22px; background:linear-gradient(120deg,rgba(20,27,48,.97),rgba(13,22,38,.94)); box-shadow:0 16px 46px rgba(0,0,0,.22); margin-bottom:16px; }
+#hero .eyebrow { color:#aaa3ff; text-transform:uppercase; letter-spacing:.16em; font-size:10px; font-weight:800; }
+#hero h1 { color:#f8fafc; font-size:clamp(27px,3.6vw,42px); line-height:1.08; margin:7px 0; }
+#hero p { max-width:760px; color:#aab7ce; font-size:14px; line-height:1.55; margin:0; }
+#hero .trust { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+#hero .trust span { padding:5px 9px; border-radius:999px; color:#c9d7ea; font-size:10px; border:1px solid #8998b32b; background:#172239a8; }
+#studio-layout { align-items:flex-start !important; gap:16px; }
+#controls-panel, #results-panel { border:1px solid rgba(148,163,184,.15) !important; border-radius:21px !important; background:rgba(15,20,34,.94) !important; padding:18px !important; box-shadow:0 13px 40px rgba(0,0,0,.22); }
+#controls-panel h2, #results-panel h2 { color:#f5f7ff; margin-top:0; }
+#controls-panel .block, #results-panel .block { border-radius:12px; }
+#controls-panel input, #controls-panel textarea, #controls-panel select { border-radius:11px !important; }
+#model-card { border:1px solid #35425a; border-radius:14px; padding:11px 13px; background:linear-gradient(110deg,#111a2b,#151a2b); margin:6px 0 12px; }
+#model-card .model-note { color:#97a8c1; font-size:11px; margin-top:1px; }
+#prompt textarea { min-height:132px !important; font-size:15px !important; line-height:1.55 !important; }
+#example-row { gap:7px; margin:2px 0 8px; }
+#example-row button { font-size:10px !important; border-radius:999px !important; padding:6px 9px !important; border-color:#34415a !important; background:#151e2e !important; }
+#settings-card { border:1px solid #28354a; border-radius:15px; padding:12px; margin:8px 0 10px; background:#0c1220; }
+#settings-card h3 { font-size:13px; margin:0 0 7px; }
+#generate-button button { min-height:51px; border-radius:13px !important; font-size:14px !important; font-weight:800 !important; color:white !important; background:linear-gradient(100deg,#665cf0,#8b5cf6 54%,#11b6c9) !important; border:0 !important; box-shadow:0 9px 25px rgba(99,102,241,.24); }
 #generate-button button:hover { filter:brightness(1.08); transform:translateY(-1px); }
-#result-gallery { border-radius:16px; overflow:hidden; }
-#suggestions-panel { border:1px solid rgba(129,140,248,.18); border-radius:16px; background:rgba(30,41,59,.35); padding:14px; }
-#developer-card { margin-top:14px; padding:16px 20px; border-radius:18px; border:1px solid rgba(34,211,238,.16); background:linear-gradient(105deg,rgba(14,25,42,.98),rgba(21,26,49,.96)); }
-#developer-card h3 { color:#f8fafc; margin:0 0 4px; font-size:15px; }
-#developer-card p { color:#9eabc0; margin:4px 0 10px; font-size:12px; }
-#developer-card a { color:#a5b4fc; text-decoration:none; margin-right:14px; font-size:12px; }
+#result-gallery { min-height:300px; border-radius:16px; overflow:hidden; }
+#suggestions-panel { border:1px solid rgba(129,140,248,.16); border-radius:15px; background:rgba(30,41,59,.3); padding:12px; margin-top:10px; }
+#suggestions-panel h3 { margin:0 0 3px; font-size:14px; }
+#developer-card { margin-top:15px; padding:14px 18px; border-radius:17px; border:1px solid rgba(34,211,238,.15); background:linear-gradient(105deg,rgba(14,25,42,.98),rgba(21,26,49,.96)); }
+#developer-card h3 { color:#f8fafc; margin:0 0 4px; font-size:14px; }
+#developer-card p { color:#9eabc0; margin:3px 0 8px; font-size:11px; }
+#developer-card a { color:#aeb3ff; text-decoration:none; margin-right:13px; font-size:11px; }
+#developer-card a:hover { color:#67e8f9; text-decoration:underline; }
 footer { display:none !important; }
+@media (max-width: 850px) {
+    .gradio-container { padding:12px !important; }
+    #studio-layout { gap:12px; }
+}
 @media (max-width: 680px) {
-    .gradio-container { padding-left:10px !important; padding-right:10px !important; }
-    #hero { padding:19px 17px; margin-top:6px; border-radius:19px; }
-    #composer, #results-panel { padding:14px !important; border-radius:18px !important; }
-    #composer textarea { min-height:105px !important; font-size:15px !important; }
-    #generate-button button { min-height:50px; }
-    #developer-card { padding:14px; }
-    #developer-card a { display:inline-block; margin:3px 10px 3px 0; }
+    .gradio-container { padding:9px !important; }
+    #brandbar { padding:1px 3px 11px; }
+    #brandbar .local-badge { font-size:9px; padding:5px 8px; }
+    #hero { padding:18px 17px; border-radius:18px; margin-bottom:11px; }
+    #hero .trust { gap:6px; }
+    #hero .trust span { font-size:9px; }
+    #controls-panel, #results-panel { padding:13px !important; border-radius:17px !important; }
+    #prompt textarea { min-height:115px !important; font-size:14px !important; }
+    #example-row button { font-size:9px !important; padding:5px 7px !important; }
+    #generate-button button { min-height:49px; }
+    #result-gallery { min-height:230px; }
+    #developer-card { padding:13px; }
+    #developer-card a { display:inline-block; margin:3px 9px 3px 0; }
 }
 """
 
 
 with gr.Blocks(
-    title="Puffx AI Image Studio",
+    title="Puffx AI Image Generator",
     theme=gr.themes.Soft(primary_hue="violet", secondary_hue="cyan", neutral_hue="slate"),
     css=APP_CSS,
 ) as demo:
     gr.HTML(
         """
+        <header id="brandbar">
+          <div class="brand"><span class="brand-mark">✦</span><span>Puffx AI</span></div>
+          <span class="local-badge">● Runs privately on your computer</span>
+        </header>
         <section id="hero">
-          <div class="eyebrow">PUFFX HOST · PRIVATE IMAGE STUDIO</div>
-          <h1>What would you like to create?</h1>
-          <p>Describe your idea in your own words. Generate a set of images locally, then refine your prompt if you want.</p>
+          <div class="eyebrow">PUFFX HOST · LOCAL IMAGE GENERATOR</div>
+          <h1>Turn your ideas into images.</h1>
+          <p>Choose a model, describe what you imagine, and create images on your computer. Download a model once, then use it offline.</p>
+          <div class="trust"><span>Private by default</span><span>Works offline after setup</span><span>1–4 images per batch</span></div>
         </section>
         """
     )
-
-    mode = gr.Radio(
-        choices=["Simple", "Advanced"],
-        value="Simple",
-        label="Choose your workspace",
-        info="Simple keeps the screen focused. Advanced reveals the full image controls.",
-        elem_id="mode-row",
-    )
-    with gr.Column(elem_id="composer"):
-        prompt = gr.Textbox(
-            label="Your prompt",
-            placeholder="A tiny cabin beside a quiet lake at sunrise, soft mist, warm cinematic light…",
-            lines=4,
-            max_lines=8,
-            autofocus=True,
-        )
-        with gr.Row(elem_id="idea-row"):
-            gr.Button("Cozy landscape", size="sm").click(
-                lambda: "A cozy cabin beside a quiet lake at sunrise, soft mist, warm light",
-                outputs=[prompt],
+    with gr.Row(equal_height=False, elem_id="studio-layout"):
+        with gr.Column(scale=6, elem_id="controls-panel"):
+            gr.Markdown("## Create an image")
+            gr.HTML(
+                """
+                <div id="model-card">
+                  <div style="font-weight:700;color:#edf2ff">Choose a model</div>
+                  <div class="model-note">Download once with the model ID from the README. Larger models need more memory.</div>
+                </div>
+                """
             )
-            gr.Button("Dreamy portrait", size="sm").click(
-                lambda: "An expressive portrait surrounded by wildflowers, dreamy natural light",
-                outputs=[prompt],
-            )
-            gr.Button("Product photo", size="sm").click(
-                lambda: "A premium product on a clean studio backdrop, soft commercial lighting",
-                outputs=[prompt],
-            )
-        with gr.Row():
-            image_count = gr.Slider(
-                1, 4, value=2, step=1, label="Images to create",
-                info="Generate up to four variations together.",
-            )
-        model_choices = [
-            (f"{details['name']} · {details['size']}", key)
-            for key, details in MODEL_CATALOG.items()
-        ]
-        with gr.Column(visible=False, elem_id="advanced-panel") as advanced_panel:
-            gr.Markdown("### Advanced controls")
-            gr.Markdown("Optional settings for users who want more control.")
+            model_choices = [
+                (f"{details['name']} · {details['size']}", key)
+                for key, details in MODEL_CATALOG.items()
+            ]
             model = gr.Dropdown(
                 choices=model_choices,
                 value=DEFAULT_MODEL,
                 label="AI model",
-                info="Choose a model already downloaded on this computer.",
+                info="Select a model already downloaded on this computer.",
             )
-            with gr.Row():
-                style = gr.Dropdown(
-                    choices=list(STYLE_PRESETS),
-                    value="No extra style",
-                    label="Art style",
-                )
-                aspect = gr.Dropdown(
-                    choices=["Square · 1:1", "Portrait · 2:3", "Landscape · 3:2", "Wide · 16:9", "Story · 9:16"],
-                    value="Square · 1:1",
-                    label="Image shape",
-                )
+            prompt = gr.Textbox(
+                label="What picture should AI make?",
+                placeholder="A small astronaut tending flowers on the moon, soft cinematic light…",
+                lines=4,
+                max_lines=8,
+                elem_id="prompt",
+            )
+            gr.Markdown("**Try an example**")
+            example_prompts = [
+                "A small astronaut tending flowers on the moon",
+                "A cozy village beside a lake at sunrise",
+                "A friendly orange cat wearing a tiny crown",
+                "A peaceful mountain cabin in falling snow",
+            ]
+            with gr.Row(elem_id="example-row"):
+                for example in example_prompts:
+                    gr.Button(example, size="sm").click(
+                        lambda value=example: value,
+                        outputs=[prompt],
+                    )
             negative = gr.Textbox(
                 label="Things to avoid (optional)",
                 placeholder="blurry, text, watermark, extra fingers",
                 lines=2,
             )
-            with gr.Row():
-                width = gr.Slider(256, 768, value=512, step=64, label="Width")
-                height = gr.Slider(256, 768, value=512, step=64, label="Height")
-            with gr.Row():
-                steps = gr.Slider(1, 50, value=25, step=1, label="Detail steps")
-                guidance = gr.Slider(0, 12, value=7.5, step=0.5, label="Prompt strength")
-            seed = gr.Number(value=-1, precision=0, label="Seed · -1 for random")
+            with gr.Group(elem_id="settings-card"):
+                gr.Markdown("### Image settings")
+                with gr.Row():
+                    style = gr.Dropdown(
+                        choices=list(STYLE_PRESETS),
+                        value="No extra style",
+                        label="Art style",
+                    )
+                    aspect = gr.Dropdown(
+                        choices=["Square · 1:1", "Portrait · 2:3", "Landscape · 3:2", "Wide · 16:9", "Story · 9:16"],
+                        value="Square · 1:1",
+                        label="Composition",
+                    )
+                with gr.Row():
+                    width = gr.Slider(256, 768, value=512, step=64, label="Width")
+                    height = gr.Slider(256, 768, value=512, step=64, label="Height")
+                with gr.Row():
+                    steps = gr.Slider(1, 50, value=25, step=1, label="Quality steps")
+                    guidance = gr.Slider(0, 12, value=7.5, step=0.5, label="Prompt strength")
+                with gr.Row():
+                    image_count = gr.Slider(1, 4, value=2, step=1, label="Images per batch")
+                    seed = gr.Number(value=-1, precision=0, label="Seed (-1 = random)")
 
-        run = gr.Button("✦ Generate 2 images", variant="primary", elem_id="generate-button")
-        gr.Markdown(
-            "<div style='text-align:center;color:#8190a8;font-size:11px'>"
-            "Runs on your computer · Images save to outputs/ · Choose Advanced for more controls"
-            "</div>"
-        )
+            run = gr.Button("✦ Generate 2 images", variant="primary", elem_id="generate-button")
+            gr.Markdown(
+                "<div style='text-align:center;color:#8290a8;font-size:10px'>"
+                "Images are saved as PNG files in outputs/ on this computer."
+                "</div>"
+            )
 
-    with gr.Column(elem_id="results-panel"):
-        gr.Markdown("## Your images")
-        status = gr.Markdown("Your images will appear here.")
-        gallery = gr.Gallery(
-            label="Generated images",
-            columns=2,
-            height=560,
-            object_fit="contain",
-            type="filepath",
-            show_label=False,
-            elem_id="result-gallery",
-        )
-        with gr.Group(elem_id="suggestions-panel"):
-            gr.Markdown("### Try another direction")
-            gr.Markdown("After you create images, choose an idea to update your prompt.")
-            suggestion_boxes = [
-                gr.Textbox(label=f"Prompt idea {i + 1}", interactive=False, lines=2)
-                for i in range(3)
-            ]
-            suggestion_buttons = [gr.Button(f"Use idea {i + 1}") for i in range(3)]
+        with gr.Column(scale=5, elem_id="results-panel"):
+            gr.Markdown("## Your image")
+            status = gr.Markdown("Your generated images will appear here.")
+            gallery = gr.Gallery(
+                label="Generated images",
+                columns=2,
+                height=540,
+                object_fit="contain",
+                type="filepath",
+                show_label=False,
+                elem_id="result-gallery",
+            )
+            with gr.Group(elem_id="suggestions-panel"):
+                gr.Markdown("### Try another direction")
+                gr.Markdown("After generation, use an idea below to update your prompt.")
+                suggestion_boxes = [
+                    gr.Textbox(label=f"Prompt idea {i + 1}", interactive=False, lines=2)
+                    for i in range(4)
+                ]
+                suggestion_buttons = [gr.Button(f"Use idea {i + 1}") for i in range(4)]
 
     gr.HTML(
         """
         <section id="developer-card">
-          <h3>Made by Nitin Mehta · Puffx Host</h3>
-          <p>Questions or feedback? Contact the developer.</p>
+          <h3>Made with care by Nitin Mehta · Puffx Host</h3>
+          <p>Questions or feedback? Get in touch with the developer.</p>
           <a href="mailto:support@puffxhost.in">✉ support@puffxhost.in</a>
-          <a href="https://puffxhost.com/contact" target="_blank" rel="noopener">Puffx Host · Contact</a>
-          <a href="https://wa.me/917354336624" target="_blank" rel="noopener">WhatsApp support</a>
+          <a href="https://puffxhost.com/contact" target="_blank" rel="noopener">Website & contact</a>
+          <a href="https://wa.me/917354336624" target="_blank" rel="noopener">WhatsApp</a>
         </section>
         """
     )
 
-    mode.change(
-        lambda value: gr.update(visible=value == "Advanced"),
-        inputs=[mode],
-        outputs=[advanced_panel],
-    )
     model.change(
         update_model_controls,
         inputs=[model],
@@ -512,34 +540,17 @@ with gr.Blocks(
         inputs=[aspect],
         outputs=[width, height],
     )
-    def run_generation(model_key, text, avoid, art_style, detail_steps, prompt_strength, chosen_seed, image_width, image_height, image_total):
-        return generate(
-            model_key, text, avoid, art_style, detail_steps, prompt_strength,
-            chosen_seed, image_width, image_height, image_total,
-        )
-
-    def run_simple_generation(text, image_total):
-        return generate(
-            DEFAULT_MODEL, text, "", "No extra style", 25, 7.5, -1,
-            512, 512, image_total,
-        )
-
-    def update_count_label(value):
-        return gr.update(value=f"✦ Generate {int(value)} image{'s' if int(value) != 1 else ''}")
-
-    image_count.change(update_count_label, inputs=[image_count], outputs=[run])
-    def dispatch_generation(current_mode, text, image_total, model_key, avoid, art_style, detail_steps, prompt_strength, chosen_seed, image_width, image_height):
-        if current_mode == "Advanced":
-            return run_generation(
-                model_key, text, avoid, art_style, detail_steps, prompt_strength,
-                chosen_seed, image_width, image_height, image_total,
-            )
-        return run_simple_generation(text, image_total)
-
+    image_count.change(
+        lambda value: gr.update(
+            value=f"✦ Generate {int(value)} image{'s' if int(value) != 1 else ''}"
+        ),
+        inputs=[image_count],
+        outputs=[run],
+    )
     run.click(
-        dispatch_generation,
-        inputs=[mode, prompt, image_count, model, negative, style, steps, guidance, seed, width, height],
-        outputs=[gallery, status, *suggestion_boxes],
+        generate,
+        [model, prompt, negative, style, steps, guidance, seed, width, height, image_count],
+        [gallery, status, *suggestion_boxes],
         concurrency_limit=1,
     )
     for button, suggestion in zip(suggestion_buttons, suggestion_boxes):
