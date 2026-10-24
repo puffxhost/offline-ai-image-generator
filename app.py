@@ -139,9 +139,12 @@ def update_model_controls(model_key: str):
     settings = MODEL_CATALOG.get(model_key, MODEL_CATALOG[DEFAULT_MODEL])
     step_min, step_max, step_default = settings["steps"]
     guidance_min, guidance_max, guidance_default = settings["guidance"]
+    resolution_max = settings.get("max_resolution", 768)
     return (
         gr.update(minimum=step_min, maximum=step_max, value=step_default),
         gr.update(minimum=guidance_min, maximum=guidance_max, value=guidance_default),
+        gr.update(maximum=resolution_max, value=512),
+        gr.update(maximum=resolution_max, value=512),
     )
 
 
@@ -175,10 +178,11 @@ def generate(
     except (TypeError, ValueError, OverflowError) as exc:
         raise gr.Error("Prompt strength must be a number.") from exc
 
-    if not 256 <= width <= 768 or width % 8:
-        raise gr.Error("Width must be between 256 and 768 pixels, in multiples of 8.")
-    if not 256 <= height <= 768 or height % 8:
-        raise gr.Error("Height must be between 256 and 768 pixels, in multiples of 8.")
+    max_resolution = MODEL_CATALOG[model_key].get("max_resolution", 768)
+    if not 256 <= width <= max_resolution or width % 8:
+        raise gr.Error(f"Width must be between 256 and {max_resolution} pixels, in multiples of 8.")
+    if not 256 <= height <= max_resolution or height % 8:
+        raise gr.Error(f"Height must be between 256 and {max_resolution} pixels, in multiples of 8.")
     if not step_min <= steps <= step_max:
         model_name = MODEL_CATALOG[model_key]["name"]
         raise gr.Error(f"Steps for {model_name} must be between {step_min} and {step_max}.")
@@ -243,8 +247,7 @@ def generate(
         raise
     except RuntimeError as exc:
         if "out of memory" in str(exc).lower():
-            if device == "cuda":
-                torch.cuda.empty_cache()
+            _clear_device_cache(device)
             raise gr.Error(
                 "Not enough memory for this image. Try a smaller size such as 512 × 512, "
                 "fewer steps, or close other GPU-heavy apps."
@@ -322,7 +325,7 @@ with gr.Blocks(title="Puffx AI Image Generator · Puffx Host", theme=gr.themes.S
     model.change(
         update_model_controls,
         inputs=[model],
-        outputs=[steps, guidance],
+        outputs=[steps, guidance, width, height],
     )
     gr.Markdown("---\nMade with ❤️ by **Puffx Host** · [Support](https://puffxhost.com/contact)")
     run.click(
