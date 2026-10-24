@@ -112,23 +112,43 @@ python -m pip install -r requirements.txt
 
 This installs Diffusers, Transformers, Gradio, and the model-loading libraries. PyTorch is installed separately because its package command varies by hardware.
 
-## 5. Download the model (internet required)
+## 5. Choose and download an AI model (internet required once)
 
-With the internet connected, run:
+The app includes a model menu. Download whichever models you want while online; each one stays in its own folder, and you can switch models later from the app. You do not have to install all of them. Download size is disk space used by model files, not the RAM/VRAM requirement. Actual totals can vary with repository updates and file formats.
+
+| Model | Approximate model download | Best for | Notes |
+| --- | ---: | --- | --- |
+| [Segmind Tiny SD](https://huggingface.co/segmind/tiny-sd) (tiny-sd) | about 1.1 GB | Low disk space and lighter computers | Smallest option; expect simpler results. |
+| [Stable Diffusion 1.5](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5) (stable-diffusion-v1-5) | about 4.3 GB of weights | General-purpose images | Balanced default. |
+| [Stable Diffusion Turbo](https://huggingface.co/stabilityai/sd-turbo) (sd-turbo) | about 5.2 GB of weights | Faster drafts | Use 1–4 steps. Read Stability AI model terms. |
+| [Stable Diffusion XL Base 1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) (sdxl-base-1.0) | about 7 GB of weights | Detailed, larger images | Requires more memory; start at 512 × 512 if needed. |
+| [DreamShaper 8](https://huggingface.co/Lykon/dreamshaper-8) (dreamshaper-8) | about 8 GB | Illustrative and realistic styles | Larger download; review its model card and license. |
+
+Sizes are approximate and can change. The downloader requests Diffusers component folders rather than unrelated checkpoint files that some model repositories keep alongside the pipeline. The exact transferred size can differ from these estimates.
+
+First, see the model IDs and descriptions:
+
+~~~bash
+python scripts/download_model.py --list
+~~~
+
+Download only the model you want. For example, the smallest model:
+
+~~~bash
+python scripts/download_model.py --model tiny-sd
+~~~
+
+Or download the default model:
 
 ~~~bash
 python scripts/download_model.py
 ~~~
 
-The default model is stable-diffusion-v1-5/stable-diffusion-v1-5. The download is several GB and may take a while. Wait until the script prints “Download complete.” The model files will be placed in:
+To download another choice, replace the ID with sd-turbo, sdxl-base-1.0, or dreamshaper-8. Downloads go into models/<model-id>/; for example, Tiny SD is stored in models/tiny-sd/. You need enough free disk space for every model you choose and your generated images. Keep the terminal open and internet connected until it prints “Download complete.” If interrupted, rerun the same command to resume.
 
-~~~text
-models/stable-diffusion-v1-5/
-~~~
+The model chooser appears in the app after launch. You can install several models, choose one from the AI model menu, and change the selection later. Switching unloads the previous pipeline before loading the next model to reduce memory use. Initial loading may take a few minutes. The selected model must already be downloaded to work offline.
 
-The folder should contain model_index.json. Do not close the terminal or disconnect from the internet while the download is still running. If a download is interrupted, reconnect and run the same command again.
-
-If the model host asks you to accept its terms or sign in, follow the instructions on the model page. Do not put access tokens in this repository.
+If a model host asks you to accept terms or sign in, follow the model card instructions. Never put access tokens in this repository. Check each model license and acceptable-use terms before use.
 
 ## 6. Start generating images
 
