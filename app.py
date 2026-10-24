@@ -151,6 +151,11 @@ def generate(
     width: int,
     height: int,
 ):
+    if model_key not in MODEL_CATALOG:
+        raise gr.Error("Choose one of the supported models.")
+    step_min, step_max, _ = MODEL_CATALOG[model_key]["steps"]
+    guidance_min, guidance_max, _ = MODEL_CATALOG[model_key]["guidance"]
+
     prompt = (prompt or "").strip()
     if not prompt:
         raise gr.Error("Write what you want to see in the picture first.")
@@ -181,20 +186,15 @@ def generate(
 
     style_description = STYLE_PRESETS.get(style or "No extra style")
     final_prompt = f"{prompt}, {style_description}" if style_description else prompt
-    if model_key not in MODEL_CATALOG:
-        raise gr.Error("Choose one of the supported models.")
-    step_min, step_max, _ = MODEL_CATALOG[model_key]["steps"]
-    guidance_min, guidance_max, _ = MODEL_CATALOG[model_key]["guidance"]
     actual_seed = seed if seed >= 0 else int(torch.randint(0, 2**31 - 1, (1,)).item())
     try:
-        generator = torch.Generator(device=device).manual_seed(actual_seed)
-    except Exception as exc:
-        raise gr.Error(f"Could not initialize random generation on {device}: {exc}") from exc
-
-    try:
-        # Diffusers pipelines share mutable scheduler state, so serialize simultaneous requests.
+        # Serialize loading/model switching and generation because only one pipeline is kept in memory.
         with _generation_lock:
             pipe, device = get_pipeline(model_key)
+            try:
+                generator = torch.Generator(device=device).manual_seed(actual_seed)
+            except Exception as exc:
+                raise gr.Error(f"Could not initialize random generation on {device}: {exc}") from exc
             result = pipe(
                 prompt=final_prompt,
                 negative_prompt=(negative_prompt or "").strip() or None,
