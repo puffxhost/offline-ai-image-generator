@@ -39,12 +39,10 @@ local_dir = model_root / args.model
 if args.model == DEFAULT_MODEL and os.environ.get("MODEL_DIR"):
     local_dir = Path(os.environ["MODEL_DIR"]).expanduser()
 
-if (local_dir / "model_index.json").is_file():
-    print(f"{selected['name']} already appears installed at {local_dir}.")
-    print("If loading fails, remove that model folder and download it again.")
-    raise SystemExit(0)
-
+existing_files = local_dir.exists() and any(local_dir.iterdir())
 local_dir.mkdir(parents=True, exist_ok=True)
+if existing_files:
+    print(f"Existing files found in {local_dir}; resuming or completing this download.")
 repo_id = os.environ.get("MODEL_REPO") if args.model == DEFAULT_MODEL else None
 repo_id = repo_id or selected["repo_id"]
 print(f"Downloading {selected['name']} ({selected['size']}) from {repo_id} to {local_dir}.")
