@@ -11,6 +11,7 @@ MODEL_CATALOG = {
         "repo_id": "segmind/tiny-sd",
         "size": "about 1.1 GB",
         "tier": "Small",
+        "steps": (10, 50, 25),
         "description": "Lowest storage and memory option; faster, lighter results.",
     },
     "stable-diffusion-v1-5": {
@@ -18,6 +19,7 @@ MODEL_CATALOG = {
         "repo_id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
         "size": "about 4.3 GB of model weights",
         "tier": "Medium",
+        "steps": (1, 4, 2),
         "description": "Balanced general-purpose model; default selection.",
     },
     "sd-turbo": {
