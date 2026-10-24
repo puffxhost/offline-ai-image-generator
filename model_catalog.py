@@ -19,7 +19,7 @@ MODEL_CATALOG = {
         "repo_id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
         "size": "about 4.3 GB of model weights",
         "tier": "Medium",
-        "steps": (1, 4, 2),
+        "steps": (10, 50, 25),
         "description": "Balanced general-purpose model; default selection.",
     },
     "sd-turbo": {
@@ -27,6 +27,7 @@ MODEL_CATALOG = {
         "repo_id": "stabilityai/sd-turbo",
         "size": "about 5.2 GB of model weights",
         "tier": "Medium",
+        "steps": (1, 4, 2),
         "description": "Fast generation; designed for very few steps.",
     },
     "dreamshaper-8": {
@@ -34,6 +35,7 @@ MODEL_CATALOG = {
         "repo_id": "Lykon/dreamshaper-8",
         "size": "about 8 GB",
         "tier": "Large",
+        "steps": (10, 50, 25),
         "description": "Versatile illustrative and photorealistic styles.",
     },
     "sdxl-base-1.0": {
@@ -41,6 +43,7 @@ MODEL_CATALOG = {
         "repo_id": "stabilityai/stable-diffusion-xl-base-1.0",
         "size": "about 7 GB of model weights",
         "tier": "Large",
+        "steps": (10, 50, 25),
         "description": "Higher detail and native 1024-pixel output; needs more memory.",
     },
 }
