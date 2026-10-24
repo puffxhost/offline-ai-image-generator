@@ -160,7 +160,8 @@ python app.py
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860) in your browser. If the browser does not open automatically, enter that address yourself.
 
-1. Choose a downloaded model in the AI model menu. The app can only use models already downloaded to the models folder.\n2. Type what you want to see, or click one of the example ideas. Most catalog models follow English prompts best.
+1. Choose a downloaded model in the AI model menu. The app can only use models already downloaded to the models folder.
+2. Type what you want to see, or click one of the example ideas. Most catalog models follow English prompts best.
 3. Optionally list things to avoid, such as "blurry" or "extra fingers."
 4. Choose an art style, such as watercolor, anime, or photorealistic.
 5. Start with 512 × 512; larger images need more memory.
@@ -277,7 +278,8 @@ A remote Linux computer can run this app if it has Python and enough disk/RAM/GP
 
 The app reads these environment variables when it starts:
 
-- MODEL_ROOT: parent folder for catalog models. Default: models. Each model is stored in its own subfolder, such as models/tiny-sd.\n- MODEL_DIR: optional custom local Diffusers folder used for the default Stable Diffusion 1.5 choice. Prefer MODEL_ROOT for catalog models.
+- MODEL_ROOT: parent folder for catalog models. Default: models. Each model is stored in its own subfolder, such as models/tiny-sd.
+- MODEL_DIR: optional custom local Diffusers folder used for the default Stable Diffusion 1.5 choice. Prefer MODEL_ROOT for catalog models.
 - OUTPUT_DIR: path where generated PNG files are saved. Default: outputs.
 - HOST: local web address to bind. Default: 127.0.0.1.
 - PORT: web port. Default: 7860.
