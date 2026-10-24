@@ -230,11 +230,12 @@ def generate(
     return str(path), f"Saved: {path}\nSeed: {actual_seed} · Device: {device} · Style: {style_label}"
 
 
-with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="Puffx AI Image Generator · Puffx Host", theme=gr.themes.Soft()) as demo:
     gr.Markdown(
-        "# Offline AI Image Generator\n"
-        "Write what picture you want, choose an optional art style, and generate it on this computer. "
-        "After the one-time model download, it works without internet."
+        "# Puffx AI Image Generator\n"
+        "Create images from your ideas on your own computer with Puffx AI. "
+        "Choose a model, download it once, and use it offline.\n\n"
+        "**By Puffx Host** · [puffxhost.com](https://puffxhost.com)"
     )
     gr.Markdown(
         "### Choose a model\n"
@@ -290,6 +291,7 @@ with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as de
         inputs=[model],
         outputs=[steps, guidance],
     )
+    gr.Markdown("---\nMade with ❤️ by **Puffx Host** · [Support](https://puffxhost.com/contact)")
     run.click(
         generate,
         [model, prompt, negative, style, steps, guidance, seed, width, height],

@@ -1,5 +1,7 @@
+name: puffx-ai-image-generator
+
 services:
-  offline-image-studio:
+  puffx-ai-image-generator:
     image: ghcr.io/puffxhost/offline-ai-image-generator:latest
     build: .
     pull_policy: missing

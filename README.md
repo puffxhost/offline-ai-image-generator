@@ -1,6 +1,6 @@
-# Offline AI Image Generator
+# Puffx AI Image Generator
 
-Generate text-to-image artwork on your own computer. The model is downloaded once while you are online. After setup, the app loads the model from disk and generates images locally.
+**Puffx AI Image Generator** is a local text-to-image app from **Puffx Host**. Turn written ideas into images on your own computer. Download a model once while online; after setup, generate locally, including offline.
 
 > First time setup needs internet and several GB of free disk space. Image generation itself can run offline. A GPU is optional, but CPU generation can be very slow.
 
@@ -234,7 +234,7 @@ For better file performance, keep the project inside the WSL Linux filesystem (f
 
 ### Docker (CPU mode)
 
-The repository provides a CPU-only Docker image for computers with Docker installed. CPU image generation can be slow. Apple Silicon/MPS and NVIDIA CUDA acceleration are not configured in this container; use a native installation for GPU acceleration.
+**Puffx Host** provides a CPU-only Docker image for computers with Docker installed. CPU image generation can be slow. Apple Silicon/MPS and NVIDIA CUDA acceleration are not configured in this container; use a native installation for GPU acceleration.
 
 The image is published to [GitHub Container Registry](https://github.com/puffxhost/offline-ai-image-generator/pkgs/container/offline-ai-image-generator) when a stable GitHub Release is published. It contains the app and CPU PyTorch, but **not the Stable Diffusion model weights**. The model is downloaded separately into a folder on your computer, so you keep control of the model files and can use them offline.
 
@@ -253,7 +253,7 @@ docker compose build
 Download the model into the mounted models folder while online:
 
 ~~~bash
-docker compose run --rm offline-image-studio python scripts/download_model.py
+docker compose run --rm puffx-ai-image-generator python scripts/download_model.py --model tiny-sd
 ~~~
 
 When the script prints “Download complete,” disconnect from the internet and start the app:
@@ -264,7 +264,7 @@ docker compose up
 
 Open http://127.0.0.1:7860 in your browser. Images are saved in the repository's outputs folder. Press Ctrl+C to stop; use `docker compose down` to stop the container. The model and output folders remain on your computer. On later runs, use `docker compose up`; the container image, model, and generated images are stored separately.
 
-The package publishes `latest`, `1`, `1.0`, and `1.0.0` tags for release `v1.0.0`. For a later release, the matching version tags are published automatically. To pin a specific version, set `image: ghcr.io/puffxhost/offline-ai-image-generator:1.0.0` in `compose.yaml`.
+The Puffx Host container package publishes `latest`, `1`, `1.1`, and `1.1.0` tags for release `v1.1.0`. Each stable release publishes version-matched tags automatically. To pin a specific version, set `image: ghcr.io/puffxhost/offline-ai-image-generator:1.1.0` in `compose.yaml`.
 
 Building the image or downloading the model requires internet once. The prebuilt CPU image supports `linux/amd64`; the model weights are several GB and must be downloaded separately. For completely offline use, pull/build the image and finish the model download before disconnecting.
 ### Cloud notebooks and remote machines
@@ -384,11 +384,12 @@ If you found this project useful, please consider giving it a star on GitHub to 
 
 Type what picture you want, and this app creates it on your computer with AI. Set it up and download the AI model once while online; after that, you can make pictures without internet.
 
-## 🧠 Developed By
+## 🧠 Puffx Host
 
-**Nitin Mehta**  
-Official site: [puffxhost.com](https://puffxhost.com)
+**Puffx AI Image Generator** is developed by **Nitin Mehta** and maintained under the Puffx Host brand.
+
+Official site: [puffxhost.com](https://puffxhost.com) · Support: [puffxhost.com/contact](https://puffxhost.com/contact)
 
 ---
 
-Made with ❤️ by Nitin Mehta.
+Made with ❤️ by **Puffx Host**.
