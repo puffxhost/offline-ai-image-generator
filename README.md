@@ -384,11 +384,12 @@ If you found this project useful, please consider giving it a star on GitHub to 
 
 Type what picture you want, and this app creates it on your computer with AI. Set it up and download the AI model once while online; after that, you can make pictures without internet.
 
-## 🧠 Developed By
+## 🧠 Puffx Host
 
-**Nitin Mehta**  
-Official site: [puffxhost.com](https://puffxhost.com)
+**Puffx AI Image Generator** is developed by **Nitin Mehta** and maintained under the Puffx Host brand.
+
+Official site: [puffxhost.com](https://puffxhost.com) · Support: [puffxhost.com/contact](https://puffxhost.com/contact)
 
 ---
 
-Made with ❤️ by Nitin Mehta.
+Made with ❤️ by **Puffx Host**.
