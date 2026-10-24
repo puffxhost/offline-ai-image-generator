@@ -277,7 +277,7 @@ A remote Linux computer can run this app if it has Python and enough disk/RAM/GP
 
 The app reads these environment variables when it starts:
 
-- MODEL_DIR: path to a local Diffusers model folder. Default: models/stable-diffusion-v1-5.
+- MODEL_ROOT: parent folder for catalog models. Default: models. Each model is stored in its own subfolder, such as models/tiny-sd.\n- MODEL_DIR: optional custom local Diffusers folder used for the default Stable Diffusion 1.5 choice. Prefer MODEL_ROOT for catalog models.
 - OUTPUT_DIR: path where generated PNG files are saved. Default: outputs.
 - HOST: local web address to bind. Default: 127.0.0.1.
 - PORT: web port. Default: 7860.
@@ -298,7 +298,7 @@ python app.py
 MODEL_DIR="$HOME/AI/Models/my-model" python app.py
 ~~~
 
-The selected model must be compatible with Diffusers StableDiffusionPipeline and must already be fully present on disk. The model download script supports changing the Hugging Face repository with MODEL_REPO before downloading; check the model's license and compatibility first.
+The selected catalog model must already be downloaded. MODEL_DIR is a legacy custom-folder override for the default choice. A custom model must be a local Diffusers pipeline with model_index.json and compatible component files. MODEL_REPO applies only to the default downloader choice; third-party custom models may require different pipeline classes and are not guaranteed to work.
 
 If port 7860 is already in use, pick another port for that run:
 
@@ -336,7 +336,7 @@ python -m pip install -r requirements.txt
 
 ### The model is missing or offline loading fails
 
-Reconnect to the internet and run python scripts/download_model.py. Confirm that models/stable-diffusion-v1-5/model_index.json exists and that the download completed. If you chose a different model, set MODEL_DIR to its local model folder.
+Reconnect to the internet and run python scripts/download_model.py --model <model-id>. Confirm that models/<model-id>/model_index.json exists and that the download completed. Select that same model in the app.
 
 ### CUDA is unavailable
 
@@ -352,9 +352,9 @@ Set PORT to 7861 using the matching shell example in Optional settings, then sta
 
 ## Model license and responsible use
 
-This repository's code is MIT licensed. The default model has a separate [CreativeML OpenRAIL-M license and model card](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5). Read and follow the model's terms and acceptable-use restrictions. If you download another model, check its terms too. The model weights are not included in this repository.
+This repository's code is MIT licensed. Every model has separate terms. Review the model cards linked in the model table before downloading or using a model, and follow its license and acceptable-use restrictions. Model weights are not included in this repository.
 
-Stable Diffusion v1.5 is primarily trained on English prompts and has known limitations and biases. The app keeps Diffusers' default safety checker enabled.
+Catalog models have different training data, prompt strengths, safety behavior, and limitations. Read each model card. The app uses each pipeline's published Diffusers configuration; not every model provides a safety checker.
 
 ## 🛟 Support & Contact
 
