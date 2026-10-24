@@ -15,14 +15,18 @@ os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"
 
 import gradio as gr
 import torch
-from diffusers import StableDiffusionPipeline
+from diffusers import DiffusionPipeline
+
+from model_catalog import DEFAULT_MODEL, MODEL_CATALOG
 
 ROOT = Path(__file__).resolve().parent
-MODEL_DIR = Path(os.environ.get("MODEL_DIR", ROOT / "models" / "stable-diffusion-v1-5")).expanduser()
+MODEL_ROOT = Path(os.environ.get("MODEL_ROOT", ROOT / "models")).expanduser()
+CUSTOM_DEFAULT_MODEL_DIR = os.environ.get("MODEL_DIR")
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", ROOT / "outputs")).expanduser()
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-_pipeline: StableDiffusionPipeline | None = None
+_pipeline = None
+_pipeline_model: str | None = None
 _pipeline_lock = Lock()
 _generation_lock = Lock()
 
@@ -36,19 +40,48 @@ STYLE_PRESETS = {
 }
 
 
-def get_pipeline() -> tuple[StableDiffusionPipeline, str]:
-    global _pipeline
-    if _pipeline is not None:
-        return _pipeline, str(_pipeline._execution_device)
+def model_directory(model_key: str) -> Path:
+    if model_key not in MODEL_CATALOG:
+        raise gr.Error("Choose one of the supported models.")
+    if model_key == DEFAULT_MODEL and CUSTOM_DEFAULT_MODEL_DIR:
+        return Path(CUSTOM_DEFAULT_MODEL_DIR).expanduser()
+    return MODEL_ROOT / model_key
+
+
+def _clear_device_cache(device: str | None = None) -> None:
+    gc.collect()
+    if (device and device.startswith("cuda")) or (device is None and torch.cuda.is_available()):
+        try:
+            torch.cuda.empty_cache()
+        except Exception:
+            pass
+    if device == "mps" or (device is None and hasattr(torch, "mps")):
+        try:
+            torch.mps.empty_cache()
+        except Exception:
+            pass
+
+
+def get_pipeline(model_key: str):
+    global _pipeline, _pipeline_model
+    if model_key not in MODEL_CATALOG:
+        raise gr.Error("Choose one of the supported models.")
+
+    model_dir = model_directory(model_key)
+    if not (model_dir / "model_index.json").is_file():
+        raise gr.Error(
+            f"{MODEL_CATALOG[model_key]['name']} is not installed at {model_dir}. "
+            f"Connect to the internet and run: python scripts/download_model.py --model {model_key}"
+        )
 
     with _pipeline_lock:
-        if _pipeline is not None:
+        if _pipeline is not None and _pipeline_model == model_key:
             return _pipeline, str(_pipeline._execution_device)
-        if not (MODEL_DIR / "model_index.json").is_file():
-            raise gr.Error(
-                f"Model not found at {MODEL_DIR}. First, connect to the internet and run "
-                "scripts/download_model.py. Then you can disconnect and run this app offline."
-            )
+
+        previous_device = str(_pipeline._execution_device) if _pipeline is not None else None
+        _pipeline = None
+        _pipeline_model = None
+        _clear_device_cache(previous_device)
 
         device_options = []
         if torch.cuda.is_available():
@@ -61,8 +94,8 @@ def get_pipeline() -> tuple[StableDiffusionPipeline, str]:
         for device, dtype in device_options:
             candidate = None
             try:
-                candidate = StableDiffusionPipeline.from_pretrained(
-                    str(MODEL_DIR),
+                candidate = DiffusionPipeline.from_pretrained(
+                    str(model_dir),
                     torch_dtype=dtype,
                     local_files_only=True,
                 )
@@ -70,27 +103,20 @@ def get_pipeline() -> tuple[StableDiffusionPipeline, str]:
                 if device in {"cpu", "mps"}:
                     candidate.enable_attention_slicing()
                 _pipeline = candidate
+                _pipeline_model = model_key
                 return _pipeline, device
             except Exception as exc:
                 _pipeline = None
+                _pipeline_model = None
                 load_errors.append(f"{device}: {exc}")
                 candidate = None
-                gc.collect()
-                if device == "cuda":
-                    try:
-                        torch.cuda.empty_cache()
-                    except Exception:
-                        pass
-                elif device == "mps" and hasattr(torch, "mps") and hasattr(torch.mps, "empty_cache"):
-                    try:
-                        torch.mps.empty_cache()
-                    except Exception:
-                        pass
+                _clear_device_cache(device)
 
         details = "\n".join(load_errors)
         raise gr.Error(
-            f"Could not load the local model from {MODEL_DIR} on the available devices. "
-            f"Check that the download finished and PyTorch is compatible. Details: {details}"
+            f"Could not load {MODEL_CATALOG[model_key]['name']} from {model_dir} "
+            f"on the available devices. Check the download, model compatibility, and "
+            f"PyTorch installation. Details: {details}"
         )
 
 
@@ -104,7 +130,18 @@ def _whole_number(value: int | float, label: str) -> int:
     return number
 
 
+def update_model_controls(model_key: str):
+    settings = MODEL_CATALOG.get(model_key, MODEL_CATALOG[DEFAULT_MODEL])
+    step_min, step_max, step_default = settings["steps"]
+    guidance_min, guidance_max, guidance_default = settings["guidance"]
+    return (
+        gr.update(minimum=step_min, maximum=step_max, value=step_default),
+        gr.update(minimum=guidance_min, maximum=guidance_max, value=guidance_default),
+    )
+
+
 def generate(
+    model_key: str,
     prompt: str,
     negative_prompt: str,
     style: str,
@@ -114,6 +151,11 @@ def generate(
     width: int,
     height: int,
 ):
+    if model_key not in MODEL_CATALOG:
+        raise gr.Error("Choose one of the supported models.")
+    step_min, step_max, _ = MODEL_CATALOG[model_key]["steps"]
+    guidance_min, guidance_max, _ = MODEL_CATALOG[model_key]["guidance"]
+
     prompt = (prompt or "").strip()
     if not prompt:
         raise gr.Error("Write what you want to see in the picture first.")
@@ -131,10 +173,12 @@ def generate(
         raise gr.Error("Width must be between 256 and 768 pixels, in multiples of 8.")
     if not 256 <= height <= 768 or height % 8:
         raise gr.Error("Height must be between 256 and 768 pixels, in multiples of 8.")
-    if not 10 <= steps <= 50:
-        raise gr.Error("Steps must be between 10 and 50.")
-    if not 1 <= guidance <= 12:
-        raise gr.Error("Prompt strength must be between 1 and 12.")
+    if not step_min <= steps <= step_max:
+        model_name = MODEL_CATALOG[model_key]["name"]
+        raise gr.Error(f"Steps for {model_name} must be between {step_min} and {step_max}.")
+    if not guidance_min <= guidance <= guidance_max:
+        model_name = MODEL_CATALOG[model_key]["name"]
+        raise gr.Error(f"Prompt strength for {model_name} must be between {guidance_min} and {guidance_max}.")
     if seed < -1:
         raise gr.Error("Use -1 for a random seed, or enter 0 or a positive number.")
     if seed > 2**53 - 1:
@@ -142,16 +186,16 @@ def generate(
 
     style_description = STYLE_PRESETS.get(style or "No extra style")
     final_prompt = f"{prompt}, {style_description}" if style_description else prompt
-    pipe, device = get_pipeline()
     actual_seed = seed if seed >= 0 else int(torch.randint(0, 2**31 - 1, (1,)).item())
+    device = None
     try:
-        generator = torch.Generator(device=device).manual_seed(actual_seed)
-    except Exception as exc:
-        raise gr.Error(f"Could not initialize random generation on {device}: {exc}") from exc
-
-    try:
-        # Diffusers pipelines share mutable scheduler state, so serialize simultaneous requests.
+        # Serialize loading/model switching and generation because only one pipeline is kept in memory.
         with _generation_lock:
+            pipe, device = get_pipeline(model_key)
+            try:
+                generator = torch.Generator(device=device).manual_seed(actual_seed)
+            except Exception as exc:
+                raise gr.Error(f"Could not initialize random generation on {device}: {exc}") from exc
             result = pipe(
                 prompt=final_prompt,
                 negative_prompt=(negative_prompt or "").strip() or None,
@@ -162,6 +206,8 @@ def generate(
                 generator=generator,
             )
         image = result.images[0]
+    except gr.Error:
+        raise
     except RuntimeError as exc:
         if "out of memory" in str(exc).lower():
             if device == "cuda":
@@ -190,6 +236,21 @@ with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as de
         "Write what picture you want, choose an optional art style, and generate it on this computer. "
         "After the one-time model download, it works without internet."
     )
+    gr.Markdown(
+        "### Choose a model\n"
+        "Download any model first with `python scripts/download_model.py --model <id>`. "
+        "Models are stored separately; switching loads the selected model from disk and may take a few minutes."
+    )
+    model_choices = [
+        (f"{details['name']} · {details['size']} · {details['tier']}", key)
+        for key, details in MODEL_CATALOG.items()
+    ]
+    model = gr.Dropdown(
+        choices=model_choices,
+        value=DEFAULT_MODEL,
+        label="AI model",
+        info="Small models need less disk/RAM; SDXL and DreamShaper need more. See README for trade-offs.",
+    )
     with gr.Row():
         with gr.Column(scale=1):
             prompt = gr.Textbox(
@@ -217,16 +278,21 @@ with gr.Blocks(title="Offline AI Image Generator", theme=gr.themes.Soft()) as de
                 width = gr.Slider(256, 768, value=512, step=64, label="Width")
                 height = gr.Slider(256, 768, value=512, step=64, label="Height")
             with gr.Row():
-                steps = gr.Slider(10, 50, value=25, step=1, label="Quality steps")
-                guidance = gr.Slider(1, 12, value=7.5, step=0.5, label="Prompt strength")
+                steps = gr.Slider(1, 50, value=25, step=1, label="Quality steps")
+                guidance = gr.Slider(0, 12, value=7.5, step=0.5, label="Prompt strength")
             seed = gr.Number(value=-1, precision=0, label="Seed (-1 = random)")
             run = gr.Button("Generate image", variant="primary")
         with gr.Column(scale=1):
             image = gr.Image(label="Your AI image", type="filepath")
             status = gr.Textbox(label="Saved image details", interactive=False)
+    model.change(
+        update_model_controls,
+        inputs=[model],
+        outputs=[steps, guidance],
+    )
     run.click(
         generate,
-        [prompt, negative, style, steps, guidance, seed, width, height],
+        [model, prompt, negative, style, steps, guidance, seed, width, height],
         [image, status],
     )
 

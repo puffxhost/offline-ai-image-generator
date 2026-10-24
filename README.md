@@ -112,23 +112,43 @@ python -m pip install -r requirements.txt
 
 This installs Diffusers, Transformers, Gradio, and the model-loading libraries. PyTorch is installed separately because its package command varies by hardware.
 
-## 5. Download the model (internet required)
+## 5. Choose and download an AI model (internet required once)
 
-With the internet connected, run:
+The app includes a model menu. Download whichever models you want while online; each one stays in its own folder, and you can switch models later from the app. You do not have to install all of them. Download size is disk space used by model files, not the RAM/VRAM requirement. Actual totals can vary with repository updates and file formats.
+
+| Model | Approximate model download | Best for | Notes |
+| --- | ---: | --- | --- |
+| [Segmind Tiny SD](https://huggingface.co/segmind/tiny-sd) (tiny-sd) | about 1.1 GB | Low disk space and lighter computers | Smallest option; expect simpler results. |
+| [Stable Diffusion 1.5](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5) (stable-diffusion-v1-5) | about 4.3 GB of weights | General-purpose images | Balanced default. |
+| [Stable Diffusion Turbo](https://huggingface.co/stabilityai/sd-turbo) (sd-turbo) | about 5.2 GB of weights | Faster drafts | Use 1–4 steps. Read Stability AI model terms. |
+| [Stable Diffusion XL Base 1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) (sdxl-base-1.0) | about 7 GB of weights | Detailed, larger images | Requires more memory; start at 512 × 512 if needed. |
+| [DreamShaper 8](https://huggingface.co/Lykon/dreamshaper-8) (dreamshaper-8) | about 8 GB | Illustrative and realistic styles | Larger download; review its model card and license. |
+
+Sizes are approximate and can change. The downloader requests Diffusers component folders rather than unrelated checkpoint files that some model repositories keep alongside the pipeline. The exact transferred size can differ from these estimates.
+
+First, see the model IDs and descriptions:
+
+~~~bash
+python scripts/download_model.py --list
+~~~
+
+Download only the model you want. For example, the smallest model:
+
+~~~bash
+python scripts/download_model.py --model tiny-sd
+~~~
+
+Or download the default model:
 
 ~~~bash
 python scripts/download_model.py
 ~~~
 
-The default model is stable-diffusion-v1-5/stable-diffusion-v1-5. The download is several GB and may take a while. Wait until the script prints “Download complete.” The model files will be placed in:
+To download another choice, replace the ID with sd-turbo, sdxl-base-1.0, or dreamshaper-8. Downloads go into models/<model-id>/; for example, Tiny SD is stored in models/tiny-sd/. You need enough free disk space for every model you choose and your generated images. Keep the terminal open and internet connected until it prints “Download complete.” If interrupted, rerun the same command to resume.
 
-~~~text
-models/stable-diffusion-v1-5/
-~~~
+The model chooser appears in the app after launch. You can install several models, choose one from the AI model menu, and change the selection later. Switching unloads the previous pipeline before loading the next model to reduce memory use. Initial loading may take a few minutes. The selected model must already be downloaded to work offline.
 
-The folder should contain model_index.json. Do not close the terminal or disconnect from the internet while the download is still running. If a download is interrupted, reconnect and run the same command again.
-
-If the model host asks you to accept its terms or sign in, follow the instructions on the model page. Do not put access tokens in this repository.
+If a model host asks you to accept terms or sign in, follow the model card instructions. Never put access tokens in this repository. Check each model license and acceptable-use terms before use.
 
 ## 6. Start generating images
 
@@ -140,12 +160,13 @@ python app.py
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860) in your browser. If the browser does not open automatically, enter that address yourself.
 
-1. Type what you want to see, or click one of the example ideas. This model follows English prompts best.
-2. Optionally list things to avoid, such as "blurry" or "extra fingers."
-3. Choose an art style, such as watercolor, anime, or photorealistic.
-4. Start with 512 × 512; larger images need more memory.
-5. Leave seed at -1 for a different result each time, or reuse a whole number from 0 to 9007199254740991 to make a similar result again.
-6. Select Generate image. The first generation can take longer while the model loads. The app shows the seed, device, and style, and saves a PNG in the outputs folder.
+1. Choose a downloaded model in the AI model menu. The app can only use models already downloaded to the models folder.
+2. Type what you want to see, or click one of the example ideas. Most catalog models follow English prompts best.
+3. Optionally list things to avoid, such as "blurry" or "extra fingers."
+4. Choose an art style, such as watercolor, anime, or photorealistic.
+5. Start with 512 × 512; larger images need more memory.
+6. Leave seed at -1 for a different result each time, or reuse a whole number from 0 to 9007199254740991 to make a similar result again.
+7. Select Generate image. The first generation can take longer while the model loads. The app shows the seed, device, and style, and saves a PNG in the outputs folder.
 
 The app listens on your own computer at 127.0.0.1, keeps Gradio sharing disabled, and disables Hugging Face and Gradio telemetry. It does not send prompts or generated images to a hosted inference service.
 
@@ -257,7 +278,8 @@ A remote Linux computer can run this app if it has Python and enough disk/RAM/GP
 
 The app reads these environment variables when it starts:
 
-- MODEL_DIR: path to a local Diffusers model folder. Default: models/stable-diffusion-v1-5.
+- MODEL_ROOT: parent folder for catalog models. Default: models. Each model is stored in its own subfolder, such as models/tiny-sd.
+- MODEL_DIR: optional custom local Diffusers folder used for the default Stable Diffusion 1.5 choice. Prefer MODEL_ROOT for catalog models.
 - OUTPUT_DIR: path where generated PNG files are saved. Default: outputs.
 - HOST: local web address to bind. Default: 127.0.0.1.
 - PORT: web port. Default: 7860.
@@ -278,7 +300,7 @@ python app.py
 MODEL_DIR="$HOME/AI/Models/my-model" python app.py
 ~~~
 
-The selected model must be compatible with Diffusers StableDiffusionPipeline and must already be fully present on disk. The model download script supports changing the Hugging Face repository with MODEL_REPO before downloading; check the model's license and compatibility first.
+The selected catalog model must already be downloaded. MODEL_DIR is a legacy custom-folder override for the default choice. A custom model must be a local Diffusers pipeline with model_index.json and compatible component files. MODEL_REPO applies only to the default downloader choice; third-party custom models may require different pipeline classes and are not guaranteed to work.
 
 If port 7860 is already in use, pick another port for that run:
 
@@ -316,7 +338,7 @@ python -m pip install -r requirements.txt
 
 ### The model is missing or offline loading fails
 
-Reconnect to the internet and run python scripts/download_model.py. Confirm that models/stable-diffusion-v1-5/model_index.json exists and that the download completed. If you chose a different model, set MODEL_DIR to its local model folder.
+Reconnect to the internet and run python scripts/download_model.py --model <model-id>. Confirm that models/<model-id>/model_index.json exists and that the download completed. Select that same model in the app.
 
 ### CUDA is unavailable
 
@@ -332,9 +354,9 @@ Set PORT to 7861 using the matching shell example in Optional settings, then sta
 
 ## Model license and responsible use
 
-This repository's code is MIT licensed. The default model has a separate [CreativeML OpenRAIL-M license and model card](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5). Read and follow the model's terms and acceptable-use restrictions. If you download another model, check its terms too. The model weights are not included in this repository.
+This repository's code is MIT licensed. Every model has separate terms. Review the model cards linked in the model table before downloading or using a model, and follow its license and acceptable-use restrictions. Model weights are not included in this repository.
 
-Stable Diffusion v1.5 is primarily trained on English prompts and has known limitations and biases. The app keeps Diffusers' default safety checker enabled.
+Catalog models have different training data, prompt strengths, safety behavior, and limitations. Read each model card. The app uses each pipeline's published Diffusers configuration; not every model provides a safety checker.
 
 ## 🛟 Support & Contact
 
