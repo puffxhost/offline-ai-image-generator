@@ -214,7 +214,7 @@ def generate(
                 )
             except RuntimeError as exc:
                 is_oom = "out of memory" in str(exc).lower()
-                if not is_oom or device not in {"cuda", "mps"}:
+                if not is_oom or not (device.startswith("cuda") or device == "mps"):
                     raise
 
                 failed_device = device
