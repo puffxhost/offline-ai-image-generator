@@ -157,9 +157,10 @@ Downloading a model does not change the app code or replace the other model fold
 
 ### Download a model for Docker
 
-The native Python downloader and Docker share the same `models/` folder. Download a model before disconnecting:
+The native Python downloader and Docker share the same `models/` folder. For the new model choices in this checkout, first build the updated app image, then download a model before disconnecting:
 
 ~~~bash
+docker compose build
 docker compose run --rm puffx-ai-image-generator python scripts/download_model.py --model ssd-1b
 ~~~
 
@@ -252,7 +253,7 @@ For better file performance, keep the project inside the WSL Linux filesystem (f
 
 **Puffx Host** provides a CPU-only Docker image for computers with Docker installed. CPU image generation can be slow. Apple Silicon/MPS and NVIDIA CUDA acceleration are not configured in this container; use a native installation for GPU acceleration.
 
-The image is published to [GitHub Container Registry](https://github.com/puffxhost/offline-ai-image-generator/pkgs/container/offline-ai-image-generator) when a stable GitHub Release is published. It contains the app and CPU PyTorch, but **not the Stable Diffusion model weights**. The model is downloaded separately into a folder on your computer, so you keep control of the model files and can use them offline.
+The image is published to [GitHub Container Registry](https://github.com/puffxhost/offline-ai-image-generator/pkgs/container/offline-ai-image-generator) when a stable GitHub Release is published. It contains the app and CPU PyTorch, but **not the Stable Diffusion model weights**. The model is downloaded separately into a folder on your computer, so you keep control of the model files and can use them offline. The published image may not yet include model choices added after its release. To use the current repository's full model catalog, build the image locally with `docker compose build` before downloading models.
 
 Install Docker Desktop on Windows/macOS, or Docker Engine and the Compose plugin on Linux. Clone this repository as described above, open a terminal in the repository folder, and pull the prebuilt image while online:
 
