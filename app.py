@@ -187,6 +187,7 @@ def generate(
     style_description = STYLE_PRESETS.get(style or "No extra style")
     final_prompt = f"{prompt}, {style_description}" if style_description else prompt
     actual_seed = seed if seed >= 0 else int(torch.randint(0, 2**31 - 1, (1,)).item())
+    device = None
     try:
         # Serialize loading/model switching and generation because only one pipeline is kept in memory.
         with _generation_lock:
@@ -205,6 +206,8 @@ def generate(
                 generator=generator,
             )
         image = result.images[0]
+    except gr.Error:
+        raise
     except RuntimeError as exc:
         if "out of memory" in str(exc).lower():
             if device == "cuda":
